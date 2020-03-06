@@ -20,7 +20,12 @@ permalink_defaults:
 pretty_urls:
   trailing_index: true # Set to false to remove trailing 'index.html' from permalinks
   trailing_html: true # Set to false to remove trailing '.html' from permalinks
+# Auto-nofollow
+nofollow:
+    enable: true
+    exclude:
 
+      
 # Directory
 source_dir: source
 public_dir: public
@@ -30,6 +35,7 @@ category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
 skip_render:
+  - "portfolio/*"
 
 # Writing
 new_post_name: :year-:month-:day-:title.md # File name of new posts
@@ -94,6 +100,11 @@ ignore:
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 theme: tranquilpeak
+
+robotstxt:
+  useragent: "*"
+  disallow:
+    - /portfolio/
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
