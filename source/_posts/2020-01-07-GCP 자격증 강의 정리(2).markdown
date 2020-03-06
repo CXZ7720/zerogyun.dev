@@ -1,0 +1,60 @@
+---
+layout: post
+title:  "GCP 자격증 강의 정리(2)"
+date:   2020-01-09 04:24:21 +0900
+tags: 
+    - Coursera
+    - GCP
+    - Certificate
+    - study
+categories: GCP Certificate
+color: rgb(26,115,232, 1)
+cover: '../assets/google-cloud-platform.jpg'
+published: true
+---
+
+**Coursera 와 Quicklab 온라인 강의를 듣고 정리한 내용들입니다.**
+<!-- more -->
+* All GCP services are associated with a project
+
+* GCP Project Identifying attributes
+    
+ |Project ID|Globally unique|Chosen by you|Immutable|
+ |-|-|-|-|
+ |Projet Name|No need to be unique|Chosen by you|Mutable|
+ |Project Number|Globally unique|Assigned by GCP|Immutable|
+ 
+    
+
+* Folders offer flexible management
+1. Floders group projects under an organization
+2. Folders can contain projects, other folders, or both.
+3. Use floders to assign plicies.
+
+
+
+
+### IAM : 권한관리
+
+1. Who part : Google account or Cloud identity user,  Service account, Google group, cloudidentity of g suite domain.
+2. Can do what part :
+3. On which resource part
+	
+	
+### IAM Roles
+1. Onwer : Invite members, Remove members, Delete projects, editor, viewer 의 권한 포함.
+2. Editor : Deploy applications, modify code, Configure services, Viewer 의 권한 포함.
+3. Viewer : Read-only Access
+4. Billing administrator : Manage billing, Add and Remove admistrators
+
+>프로젝트는 여러명의 Owner, Editor, Viewer, Billing administrator 역할을 각질 수 있음.
+
+
+
+
+
+### GCP 에 접근하는 방법
+1. Console
+2. SDK
+3. APP
+4. REST API - Cloud Client Libraries, Google API Client Libraries

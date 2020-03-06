@@ -1,0 +1,204 @@
+---
+layout: post
+title:  "젠킨스와 도커를 이용한 셔틀버스 알림 서비스 개발기(2)"
+date:   2019-10-23 02:24:21 +0900
+tags: 
+  - shuttle 
+  - pwa 
+  - vue 
+  - jenkins 
+  - docker 
+  - git 
+  - devops
+categories: Shuttle_Project
+color: rgb(29,36,117,1)
+cover: '../assets/shuttle/docker-jenkins.png'
+published: true
+---
+개인 사이드프로젝트로 진행하고있는 교내 셔틀버스 알림 서비스를 제작하면서 남기는 기록의 두번째 이야기 입니다.
+<!-- excerpt -->
+
+### 실제 서비스의 문제
+
+#### 방화벽을 넘어서..
+현재 서비스되고 있는 API 컨테이너는 단과대학 소속 학회방에있는 서버 컴퓨터에서 학교 인터넷망에 연결되어 운영되고 있습니다.
+
+학교 내부망에서 동작하고 있는 서버다 보니 *Well-Known Ports* 를 제외하고는 다른 포트를 사용할 수 없다는 치명적인 문제가 발생하였습니다.
+
+![portainer](https://user-images.githubusercontent.com/29659112/67309327-a104db80-f536-11e9-9bc7-75203d837a6b.jpg)
+
+위쪽 Portainer 캡쳐 이미지를 보셔서 짐작하실 수 있겠지만, 현재 학회 서버로 운영중인 서비스가 약 5~6개 정도 되며, 저희 프로젝트만을 위해 학회 공식 홈페이지를 서비스 하고 있는 80 포트와 443 포트를 강탈할 수는 없는 노릇이죠.
+
+사실 이전부터 대두되었던 문제입니다만, 라즈베리파이를 연결하여 외부에서 사용하고자 하거나, MariaDB를 도커 컨테이너로 올려 수업중에 다른 강의실에서 연결하고자 할 경우에도 공식적으로 열려있는 포트 이외의 조금이라도 특이한 포트들은 모두 방화벽에서 In/Out 모두 차단해버리곤 했습니다
+
+이전 까지만 해도 담당 지도교수님께 찾아가 직접 자필 서명을 받고, 방화벽 해제 신청서를 학과 사무실에 제출해서 승인처리가 되어야 저희가 사용하는 IP에 대하여 특정 포트의 방화벽이 해제되는 정책이었습니다.
+
+중간 관리자나 교수님 입장에서 매번 서류작업을 한다는 것은 상당히 성가신 일입니다.
+물론 사용하고자 하는 포트를 한번에 적어서 범위로 신청하는것도 방법이지만, 어째서인지 지난번 신청 당시 그렇게 했음에도 적용이 되지 않은 케이스가 몇개 발견되어 상당히 고된 삽질을 했던것으로 기억합니다.
+
+#### NginX 리버스프록시 : 우리는 언젠가 결국 답을 찾을 것이다.
+
+열혈 구글링 끝에 ***리버스프록시*** 라는 기술에 대하여 알게되었습니다.
+
+Nginx 나 Apache가 일종의 신호등 역할을 하여 Domain을 기준으로 판별하여 내부 서비스 포트로 매칭을 시켜주는 기능 입니다.
+자세한 내용은 아래 그림을 참조하시면 쉽게 이해할 수 있습니다.
+
+![nginx](https://user-images.githubusercontent.com/29659112/67421058-b64b3a00-f60a-11e9-9e93-ad9b9e32d871.jpg)
+
+http 통신의 기본 포트인 80과 HTTPS 통신을 위한 443 포트로 모든 Inbound 연결이 들어옵니다.
+Nginx 를 역시 도커 컨테이너 형태로 띄워서 `-p 80:80, 443:443` 옵션을 주어 Host OS와 연결시켜둡니다.
+
+사실 외부 인터넷과 Nginx 컨테이너가 구동되고 있는 Host 컴퓨터 사이에는 공유기가 있기 때문에 공유기에서 포트포워딩을 통해 서버컴퓨터로 80포트와 443 포트를 바라보도록 설정하였습니다.
+
+#### NginX Proxy Manager 를 이용하여 리버스 프록시 구현
+
+구글링을 통해 나오는 NginX 리버스프록시 강좌는 무수히 많았지만 모두가 조금씩 다른 설정 파일을 만들어서 사용하고 있었습니다. 조금씩 비슷하긴 했지만 어떻게 설정해야 우리의 환경에 적합한지 한참 고민하고 있었는데요, NginX 설정을 보다 쉽게 Web UI 를 통해 할 수 있게 도와주는 좋은 프로젝트가 있어서 직접 사용해보았습니다.
+
+[Nginx Proxy Manager](https://github.com/jc21/nginx-proxy-manager)
+
+저희 팀이 선택한 해결책입니다. 가장 마음에 들었던 부분은 이 서비스 역시 **도커**를 통해서 배포되고 있다는 점이었죠.(~~기승전 도커~~)
+
+#### 컨테이너 구축
+설치 방법은 쉽습니다. docker-compose 명령어를 이용해 미리 작성된 파일을 이용해 설치하면 됩니다.
+
+다만 저는 Bridge 네트워크를 사용하기 위해 `docker-compose.yml` 파일의 각 컨테이너 세부설정에 `Network: Bridge` 라는 구문을 추가해 주었습니다.
+이 docker-compose를 이용하여 컨테이너를 가동할 경우 web_example1 이라는 컨테이너와 db_example1 이라는 두 개의 컨테이너가 동시에 가동됩니다. web 컨테이너의 경우 DB 컨테이너와 정상적으로 Connect 되어야 `Healthy` 판정을 받습니다.
+
+제 경우에는 `docker-compose.yml` Bridge Network 모드로 강제로 설정해서 그런지 DB 컨테이너를 찾지 못하는 증상이 있어서 수동으로 컨테이너에 접속하여 `config` 파일을 DB 컨테이너에 할당된 도커 IP대역으로 변경해주었습니다. (제 경우에는 172.17.0.X 대역으로 잡혔습니다.)
+
+깃허브 소스에서 `docker-compose.yml` 파일과 같은 경로에 있는 `config.json`이 DB연결시에 사용되는 설정값을 담고 있습니다.
+```json
+{
+  "database": {
+    "engine": "mysql",
+    "host": "db",
+    "name": "npm",
+    "user": "npm",
+    "password": "npm",
+    "port": 3306
+  }
+}
+```
+여기에 보면 `host` 항목이 db 라고 되어있는데 실제 가동된 컨테이너에서는 `/app/config/production.json`입니다.
+이 파일에서 해당 부분을 실제 컨테이너에서 부여받은 IP로 변경해주시면 됩니다.
+(또는 `/etc/hosts` 파일을 수정해 주셔도 될 것 같습니다.)
+
+
+이렇게 구축이 완료되면, 위에서 설정한 포트로 브라우저를 이용해 접속해봅니다.
+
+![Screenshot 2019-11-01 at 15 44 21](https://user-images.githubusercontent.com/29659112/68007404-db9d0f80-fcbe-11e9-88d0-d06464b21654.jpg)
+
+현제 저희 서버에서 가동중인 Nginx Proxy Manager 입니다.
+첫 접속시 초기 관리자계정 설정만 해주시면 동일한 화면을 만나실 수 있습니다.
+
+##### Proxy Host 등록
+리버스프록시를 설정하기 위해서는 첫번째 메뉴인 `Proxy Hosts` 메뉴로 들어갑니다.
+
+![nginxproxy](https://user-images.githubusercontent.com/29659112/68007764-f2903180-fcbf-11e9-8a47-1576b24600e1.png)
+
+아이템 추가 모달에서 기본적인 설정을 해 줍니다.
+제 경우에는 Shuttlecock_API 컨테이너가 구동중인 도커 컨테이너 IP를 입력하였고, shuttle이라는 서브도메인을 붙여주었습니다.
+
+Cloudflare Origin Cert를 이용한 HTTPS를 이용할 것이기 때문에 443 포트를 열어주었습니다.
+
+##### Cloudflare 인증서 등록
+![ssl](https://user-images.githubusercontent.com/29659112/68007883-587cb900-fcc0-11e9-955f-42a7c6349be3.png)
+
+이제 SSL 메뉴로 들어가서 `Add SSL Certificate` 를 눌러 미리 발급받아둔 Cert와 Key 파일을 삽입해줍니다.
+
+![select ssl](https://user-images.githubusercontent.com/29659112/68008029-caed9900-fcc0-11e9-8088-cc81f02cdf63.png)
+
+이제 다시 아까 Proxy Hosts 메뉴에서 방금 등록했던 아이템을 Edit 모드로 들어와 줍니다.
+
+세번째 탭의 SSL 항목에 보면 방금 등록했던 SSL 인즈서가 떠 있는것을 확인할 수 있습니다.
+
+별도의 인증서가 없다면 `Request a new SSL Certificate` 를 눌러 Let's Encrypt 인증서를 즉석에서 발급받을 수도 있습니다.
+
+##### DNS 설정
+![dns](https://user-images.githubusercontent.com/29659112/68008218-7dbdf700-fcc1-11e9-8b76-f4be83bb80c7.png)
+
+마지막으로 이용중인 DNS관리 서비스에 들어가서 A 레코드로 서브도메인을 등록해 줍니다.
+
+제가 이용하고있는 Cloudflare DNS 관리탭에서 `shuttle` 라는 서브도메인을 설정해 두었습니다.
+
+##### 완료
+
+마지막으로 테스트를 진행해 봅니다.
+```
+C:\Users\kygha>curl -v https://shuttle.jaram.net/semester/week/subway
+*   Trying 104.28.4.122...
+* TCP_NODELAY set
+* Connected to shuttle.jaram.net (104.28.4.122) port 443 (#0)
+* schannel: SSL/TLS connection with shuttle.jaram.net port 443 (step 1/3)
+* schannel: checking server certificate revocation
+* schannel: sending initial handshake data: sending 182 bytes...
+* schannel: sent initial handshake data: sent 182 bytes
+* schannel: SSL/TLS connection with shuttle.jaram.net port 443 (step 2/3)
+* schannel: failed to receive handshake, need more data
+* schannel: SSL/TLS connection with shuttle.jaram.net port 443 (step 2/3)
+* schannel: encrypted data got 2699
+* schannel: encrypted data buffer: offset 2699 length 4096
+* schannel: sending next handshake data: sending 93 bytes...
+* schannel: SSL/TLS connection with shuttle.jaram.net port 443 (step 2/3)
+* schannel: encrypted data got 258
+* schannel: encrypted data buffer: offset 258 length 4096
+* schannel: SSL/TLS handshake complete
+* schannel: SSL/TLS connection with shuttle.jaram.net port 443 (step 3/3)
+* schannel: stored credential handle in session cache
+> GET /semester/week/subway HTTP/1.1
+> Host: shuttle.jaram.net
+> User-Agent: curl/7.55.1
+> Accept: */*
+>
+* schannel: client wants to read 102400 bytes
+* schannel: encdata_buffer resized 103424
+* schannel: encrypted data buffer: offset 0 length 103424
+* schannel: encrypted data got 3997
+* schannel: encrypted data buffer: offset 3997 length 103424
+* schannel: decrypted data length: 1369
+* schannel: decrypted data added: 1369
+* schannel: decrypted data cached: offset 1369 length 102400
+* schannel: encrypted data length: 2599
+* schannel: encrypted data cached: offset 2599 length 103424
+* schannel: decrypted data length: 1369
+* schannel: decrypted data added: 1369
+* schannel: decrypted data cached: offset 2738 length 102400
+* schannel: encrypted data length: 1201
+* schannel: encrypted data cached: offset 1201 length 103424
+* schannel: decrypted data length: 1172
+* schannel: decrypted data added: 1172
+* schannel: decrypted data cached: offset 3910 length 102400
+* schannel: encrypted data buffer: offset 0 length 103424
+* schannel: decrypted data buffer: offset 3910 length 102400
+* schannel: schannel_recv cleanup
+* schannel: decrypted data returned 3910
+* schannel: decrypted data buffer: offset 0 length 102400
+< HTTP/1.1 200 OK
+< Date: Fri, 01 Nov 2019 07:10:28 GMT
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 3164
+< Connection: keep-alive
+< Set-Cookie: 
+ expires=Sat, 31-Oct-20 07:10:28 GMT; path=/; domain=.jaram.net; HttpOnly
+< X-Powered-By: Express
+< Access-Control-Allow-Origin: *
+< Access-Control-Allow-Methods: GET
+< Access-Control-Allow-Headers: content-type
+< ETag: W/"c5c-5nbjArWyrXTTrHZr5cBgV5Mhwpg"
+< Strict-Transport-Security: max-age=31536000;includeSubDomains; preload
+< X-Served-By: shuttle.jaram.net
+< CF-Cache-Status: DYNAMIC
+< Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+< Server: cloudflare
+< CF-RAY: 52ec0c91ab08db10-KIX
+<
+{중략}
+Connection #0 to host shuttle.jaram.net left intact
+```
+
+Cloudflare DNS 를 이용해 Proxy 로 설정했기 때문에 클플 데이터센터를 통해 연결이 수립된 것을 확인할 수 있습니다.
+
+실제 컨테이너는 Wellknown Port 가 아닌 다른 곳에서 서비스 하고 있지만, 443 포트로 접속하여 문제없이 연결이 수립되었음을 확인할 수 있습니다.
+
+
+이 원리를 이용하여 현재 Jenkins, Jupyter 등을 리버스프록시를 이용하여 서비스하고 있습니다.

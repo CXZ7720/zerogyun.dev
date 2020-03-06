@@ -1,0 +1,39 @@
+.popular-posts {
+    list-style: none;
+    padding-inline-start: 3px;
+
+    .popular-posts-item {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        word-wrap: normal;
+        overflow: hidden;
+            
+        .popular-posts-title {
+            display: inline;
+            h3 {
+                display: inline;
+                a {
+                    margin-left: 10px;
+                    color: $font-color-base;
+                    font: {
+                        weight: 300;
+                        size: map-get($font-size, base);
+                    }
+
+                }
+            }
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        // Change style of the list by adding font-awesome icon
+        &::before {
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 600;
+            content:     '\f0da';
+            font-size:   map-get($font-size, small);
+        }
+    }
+}

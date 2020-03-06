@@ -1,0 +1,105 @@
+---
+layout: post
+title:  "Google App Engine에 자동으로 배포하기"
+date:   2020-01-29 02:23:21 +0900
+tags: 
+  - GCP
+  - GAE
+  - GCB
+  - Google
+categories: Shuttle_Project
+color: rgb(244, 88, 88, 1)
+cover: '../assets/google-cloud-platform.jpg'
+published: true
+---
+프로젝트의 변경사항을 실시간으로 배포하기 위해 Google Cloud Build 를 이용하는 법에 해 적습니다.
+<!-- more -->
+
+# 깃헙 변경사항을 자동으로 GAE 에 배포하기
+
+그동안 Google App Engine에 새로운 변경사항을 적용하기 위해서는 일일히 로컬 머신에서 배포용 패키지를 빌드 한 다음, Google Cloud SDK 명령어를 이용하여 새로운 인스턴스를 올리는 과정을 반복해야 했다.
+
+![image](https://user-images.githubusercontent.com/29659112/73295762-a798a280-424b-11ea-82e3-34b43f1cd94c.png)
+
+우리 프로젝트의 경우 백엔드는 업데이트 주기가 길지만, 프론트엔드의 경우 한달에 많으면 약 3번까지도 잦은 배포가 있었다. 또한 DEV 서버까지 포함하면 거의 두배 이상의 잦은 배포는 상당히 귀찮은 일이었다.
+
+### Github 에 푸시와 동시에 배포를
+우리의 GCP는 이러한 고민을 해결해줄 답을 이미 알고 있었다.
+GCP가 지원하는 서비스 중, [Google Cloud Build](https://cloud.google.com/cloud-build/?hl=ko) 라는게 있다. 이름부터 느껴지듯이 사용자가 트리거를 설정해두면, 해당 이벤트 발생시 자동으로 빌드가 되도록 할 수 있는 시스템이다.
+
+매일 120간의 무료 빌드가 가능하니 소소한 플젝을 주로 하는 나같은 학생개발자도 부담없이 사용할 수 있다.
+
+### GCB와 Github 저장소 연결
+
+먼저 GCP 콘솔에서 Google Cloud Build 서비스로 들어간다.
+제일 먼저 저장소 연결을위해 트리거탭에서 새로운 저장소 생성을 한다.
+![image](https://user-images.githubusercontent.com/29659112/73296711-90f34b00-424d-11ea-9cd5-65ecd8d81a85.png)
+
+소스 선택 방법으로 여러가지가 있는데, 제일 위의 `Github(Cloud build github 앱)` 을 선택해준다. 이 옵션은 Github App을 연동된 계정에 설치하고, 레포지토리에 접근권한을 승인함으로써 변경사항을 실시간으로 추적할 수 있도록 한다.
+
+Github Oauth 인증과정을 마치고, 빌드를 원하는 대상 레포지토리에 Cloud build 앱을 설치해준다.(앱을 설치한다 해서 레포지토리의 컨텐츠가 변하는 것은 아니다. 접근 승인권한을 얻기 위한 3rd Party App 같은 느낌인것 같다.)
+
+![image](https://user-images.githubusercontent.com/29659112/73297001-1971eb80-424e-11ea-8679-1865a2ee7198.png)
+
+이 단계를 마치면 저장소 선택 단계에서 앱을 설치한 레포지토리가 목록에 뜰 것이다.
+만약, 이전단계에서 모든 저장소에 앱을 설치하도록 했다면 본인 Github 계정의 모든 레포지토리가 목록에서 보일 것이다.
+
+이 중 빌드 대상이 되는 레포지토리를 선택한다.
+
+![image](https://user-images.githubusercontent.com/29659112/73297182-6f469380-424e-11ea-823c-fafd2104f032.png)
+
+다음은 트리거를 작성하는 단계이다.
+제일 위에서부터, 트리거를 알아볼수 있는 이름을 입력한다.
+설명은 본인, 또는 담당자들이 알아볼 수 있도록 입력한다.
+트리거 유형은 브랜치, Tag, 가져오기 요청(Pull Request 를 직역한듯) 중에서 고를 수 있다. 본인 프로젝트의 유형에 알맞게 고르면 될 것 같다.
+
+나의 경우에는 Master 브랜치에 발생하는 모든 커밋마다 즉시 빌드하도록 하기 위하여 브랜치를 선택했다.
+
+그 다음으로 타겟 브랜치를 선택한다. 정규표현식으로 브랜치를 특정하도록 되어있는데, 자동완성을 지원하기 때문에 `master` 와 같이 브랜치 이름만 입력하면 알아서 찾아준다.
+
+빌드 구성의 경우 `Cloud Build 구성파일(yaml 또는 json)` 으로 선택했다. 보통의 경우 자동감지를 사용해도 좋지만, 나의 경우 Dockerfile이 따로 별도의 환경을 위해 이미 구성된상태로 레포지토리에 존재하여 직접 빌드 구성파일을 지정하였다.
+
+
+다음단계로 나아가기 전에 이 Cloud Build 구성파일에대하여 좀 더 알아보자.
+일단 이 파일의 역할은 Google Cloud Build 서비스가 어떻게 빌드할지 확인하게 될 **설명서** 역할을 하게 된다. 따라서 우리가 Google Cloud SDK 에 직접 입력하던 명령어들이 들어간다고 생각하면 쉽다.
+
+아래는 우리 프로젝트에 사용된 [`cloudbuild.yaml`](https://github.com/CXZ7720/ERICA_shuttlecock_API/blob/master/cloudbuild.yaml) 파일이다.
+```yaml
+steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - app
+  - deploy
+```
+각 `steps` 마다 컨테이너가 빌드되게 된다. 우리 프로젝트의 경우 Google Cloud SDK 에서 사용하던 `gcloud` 커멘드를 호출하기 위하여 `gcr.io/cloud-builders/gcloud`를 `name` 필드에 선언하였다.
+그 다음, `args`를 이용해 `app`과 `deploy` 라는 파라미터를 전달하였다.
+
+이 yaml 파일을 다시 톺아보면, 그동안 로컬 머신에서 gcloud sdk를 통해 명령줄에서 실행시켰던 커맨드(`gcloud app deploy`)와 크게 다르지 않다는 것을 알 수 있을 것이다.
+
+
+`cloudbuild.yaml` 파일에 관한 자세한 템플릿들은 [https://cloud.google.com/cloud-build/docs/build-config?hl=ko](https://cloud.google.com/cloud-build/docs/build-config?hl=ko) 에서 확인할 수 있다.
+
+이제 해당 파일을 본인의 빌드 대상 레포지토리 루트에 저장하고 푸시하면 모든 사전절차는 끝난다.
+
+<br><br>
+
+다시 Google Cloud Build 설정창으로 돌아와서, 구성파일까지 설정이 완료되었다면 저장을 눌러 트리거설정을 완료한다.
+
+마지막으로 좌측 카테고리중, 설정에 들어가서 Google Cloud Builder 서비스 계정이 우리 프로젝트에 직접적인 관리권한을 얻을 수 있도록 `서비스 계정 권한`을 할당해준다.
+
+나의 경우에는 Google App Engine 에 변경사항이 반영되도록 할 것이므로, 해당 GCP 서비스에 관리자권한을 사용설정으로 바꿔주었다.
+
+![image](https://user-images.githubusercontent.com/29659112/73298410-9bfbaa80-4250-11ea-9d86-0cec33e5c99c.png)
+
+여기까지 모든 설정 작업이 끝났다.
+이제 Github의 등록된 레포의 선택된 브랜치로 Push, Merge 이벤트가 발생할 경우 Gcloud Builder가 자동으로 이를 감지해 빌드를 시작하고, 변경사항을 자동으로 배포해줄것이다.
+
+![image](https://user-images.githubusercontent.com/29659112/73298596-f137bc00-4250-11ea-9301-db30f8deab8d.png)
+
+빌드 기록을 들여다보자.
+트리거를 연결해두기 이전에는 소스, Git 커밋, 트리거 이름, 트리거 Column이 빈칸으로 남아있다. 직접 로컬에서 gcloud sdk 명령어를 이용해 빌드를 유발했을때 저렇게 기록이 남는다. 자동으로 트리거가 빌드를 유발한 경우 어떤 커밋에 의해 발생된 빌드인지 같이 띄워준다.
+
+
+
+이제 자동으로 빌드되는 모습을 흐믓하게 바라보는 일만 남았다.<br>
+즐거운 빌드 되시길.
