@@ -16,12 +16,13 @@ color: rgb(0, 130, 201, 1)
 cover: '../assets/SSL_A.png'
 published: true
 ---
-
+이전 포스팅에서 B등급으 받은 SSL Labs 테스트를 보완하여 A등급까지 끌어올리는 방법을 소개합니다.
+<!-- excerpt -->
 # SSL Labs 점수 높이기
 
 이전 글에서 테스트했던 제 클라우드서버의 SSL 점수는 B 등급이었습니다.
 점수가 깎인 주요한 원인으로는 TLS1.0, TLS1.1 프로토콜의 지원, 그리고 Forward Secracy(전방향 암호화) 를 지원하지 않는 알고리즘의 사용 때문이었습니다.
-<!-- excerpt -->
+
 ![image](https://user-images.githubusercontent.com/29659112/73431286-660b1300-4383-11ea-99ee-1f1ba45ebb5e.png)
 
 
