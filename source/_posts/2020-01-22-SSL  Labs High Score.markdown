@@ -16,7 +16,7 @@ color: rgb(0, 130, 201, 1)
 cover: '../assets/SSL_A.png'
 published: true
 ---
-이전 포스팅에서 B등급으 받은 SSL Labs 테스트를 보완하여 A등급까지 끌어올리는 방법을 소개합니다.
+이전 포스팅에서 B등급을 받은 SSL Labs 테스트를 보완하여 A등급까지 끌어올리는 방법을 소개합니다.
 <!-- excerpt -->
 # SSL Labs 점수 높이기
 
