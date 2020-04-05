@@ -24,10 +24,10 @@ const RESOURCES = {
 "/assets/images/vue.png": "1d1956a8c74c3e7df08ec100faea48a8",
 "/assets/images/whale.png": "41bc2edf7319ef6f87b0a7299e91b336",
 "/assets/images/whale_store.jpg": "cf584ffeb061189002ec50dcd485258f",
-"/assets/LICENSE": "d762534fbb65ea8f692ce1a473be5d2d",
+"/assets/LICENSE": "2371d69c7dcfd438bdefd3b5d02c2a16",
 "/assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "115e937bb829a890521f72d2e664b632",
-"/index.html": "4c670f7bfc6bb6b74d6de86a39a57d2c",
-"/main.dart.js": "b894b679750b4a8c25f14cd92772587c"
+"/index.html": "858925a492437289d17a681ef025e546",
+"/main.dart.js": "b7bff65e5da8ab412e8b919c712dc382"
 };
 
 self.addEventListener('activate', function (event) {
