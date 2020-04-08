@@ -54,7 +54,8 @@ sidebar:
             # class: open-algolia-search
         about:
             title: global.about
-            url: "#about"
+            # url: "#about"
+            url: https://zerogyun.dev/profile
             icon: fa fa-question
     author_links:
         github:
