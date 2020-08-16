@@ -5,6 +5,9 @@ tags:
     - Vue
     - HEXO
     - Github Pages
+categories:
+    - Github Ppages
+    - Vue
 ---
 vue-cli를 이용해 제작된 정적 페이지를 Github Pages에 배포하는 방법에 대해 알아봅니다.
 <!-- excerpt -->
