@@ -40,17 +40,6 @@
                 <%- partial('post/tag', {tags: post.tags})%>
             </div>
         <% } %>
-
-        <!-- 커스터마이징 해본 관련 글 영역-->
-        <% var related = popular_posts( {} , post ); %>
-        <% if (related && (related.length > 0)) { %>
-        <div class="post-footer-tags">
-            <span class="text-color-light text-small"><%= __('post.related') %></span><br />
-            <%- related %>
-        </div>
-        <% } %>
-        <!-- 끝 -->
-        
         <% if (post.actions === undefined || post.actions) { %>
             <%- partial('post/actions', {postContent: postContent}) %>
         <% } %>

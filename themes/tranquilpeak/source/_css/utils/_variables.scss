@@ -13,19 +13,19 @@ $Nanum-Gothic-Coding:  'Nanum Gothic Coding', monospace;
 $font-family-base: $nanum-sans-kr;
 
 $font-families: (
-   // base
-   'headings':          $nanum-sans-kr,
-   // components
-   'code':              $Nanum-Gothic-Coding,
-   'caption':           $nanum-sans-kr,
-   'image-gallery':     $nanum-sans-kr,
-   'post-header-cover': $nanum-sans-kr,
-   'post-meta':         $nanum-sans-kr,
-   'post-content':      $nanum-sans-kr,
-   'post-excerpt-link': $nanum-sans-kr,
-   'highlight':         $Nanum-Gothic-Coding,
-   // layout
-   'sidebar':           $nanum-sans-kr
+  // base
+        'headings':          $nanum-sans-kr,
+  // components
+        'code':              $Nanum-Gothic-Coding,
+        'caption':           $nanum-sans-kr,
+        'image-gallery':     $nanum-sans-kr,
+        'post-header-cover': $nanum-sans-kr,
+        'post-meta':         $nanum-sans-kr,
+        'post-content':      $nanum-sans-kr,
+        'post-excerpt-link': $nanum-sans-kr,
+        'highlight':         $Nanum-Gothic-Coding,
+  // layout
+        'sidebar':           $nanum-sans-kr
 );
 
 // equal to 15px
@@ -39,63 +39,63 @@ $font-size-base-sm-screen-reduction-factor: 0.1rem;
 
 // Font size : (X.Xrem = XXpx, 1.0rem = 10px)
 $font-size: (
-    'xxlarge': 2rem,
-    'xlarge': 1.8rem,
-    'large':  1.7rem,
-    'base':   $font-size-base,
-    'medium': 1.5rem,
-    'small':  1.3rem,
-    'xsmall': 1rem
+        'xxlarge': 2rem,
+        'xlarge': 1.8rem,
+        'large':  1.7rem,
+        'base':   $font-size-base,
+        'medium': 1.5rem,
+        'small':  1.3rem,
+        'xsmall': 1rem
 );
 
 // Colors
 $colors: (
-    'success': #4dc657,
-    'danger':  #f5311d,
-    'primary': #349ef3,
-    'purple':  #cf6ae0,
-    'base':    $font-color-base,
-    'warning':  #f5aa0a,
-    'light':   #9eabb3,
-     // use for tag `a`
-    'link':    #349ef3
+        'success': #4dc657,
+        'danger':  #f5311d,
+        'primary': #349ef3,
+        'purple':  #cf6ae0,
+        'base':    $font-color-base,
+        'warning':  #f5aa0a,
+        'light':   #9eabb3,
+  // use for tag `a`
+        'link':    #349ef3
 );
 
 // Z-indexes
 // `l-` prefix for layout
 // `c-` prefix for components
 $z-indexes: (
-    // position the cover below the whole blog
-    'l-cover':             -1,
-    'l-main':              10,
-    'c-post-header-cover': 15,
-    'l-header':            20,
-    'l-sidebar':           20,
-    'l-about':             30,
-    'c-mask':              30,
-    'c-post-bottom-bar':   40,
-    'c-share-options-bar': 50,
-    'c-tooltip':           1000,
-    'c-overlay':           1009,
-    'c-modal':             1010
+  // position the cover below the whole blog
+        'l-cover':             -1,
+        'l-main':              10,
+        'c-post-header-cover': 15,
+        'l-header':            20,
+        'l-sidebar':           20,
+        'l-about':             30,
+        'c-mask':              30,
+        'c-post-bottom-bar':   40,
+        'c-share-options-bar': 50,
+        'c-tooltip':           1000,
+        'c-overlay':           1009,
+        'c-modal':             1010
 );
 
 // Media Query Ranges
 // If you want to change ranges screen size, you can do it easily by changing only `$screen-min` values
 $screen-min: (
-    'xs-min': 320px,
-    'sm-min': 480px,
-     // If you change value of `md-min`,
-     // you have to change value of `mediumScreenWidth` too in `source/_js/sidebar.js`
-    'md-min': 768px,
-    'lg-min': 1024px,
-    'xlg-min': 1280px
+        'xs-min': 320px,
+        'sm-min': 480px,
+  // If you change value of `md-min`,
+  // you have to change value of `mediumScreenWidth` too in `source/_js/sidebar.js`
+        'md-min': 768px,
+        'lg-min': 1024px,
+        'xlg-min': 1280px
 );
 $screen-max: (
-    'xs-max': map-get($screen-min, sm-min) - 1,
-    'sm-max': map-get($screen-min, md-min) - 1,
-    'md-max': map-get($screen-min, lg-min) - 1,
-    'lg-max': map-get($screen-min, xlg-min) - 1
+        'xs-max': map-get($screen-min, sm-min) - 1,
+        'sm-max': map-get($screen-min, md-min) - 1,
+        'md-max': map-get($screen-min, lg-min) - 1,
+        'lg-max': map-get($screen-min, xlg-min) - 1
 );
 // Merged screen-* Maps
 $screen: map-merge($screen-min, $screen-max);
@@ -118,12 +118,12 @@ $xlarge-and-up:   "only screen and (min-width : #{map-get($screen, xlg-min)})" !
 
 // Headings font-size : (X.Xrem = XXpx, 1.0rem = 10px)
 $headings-font-size: (
-    'h1': 2.8rem,
-    'h2': 2.4rem,
-    'h3': 2.0rem,
-    'h4': 1.8rem,
-    'h5': 1.7rem,
-    'h6': 1.6rem
+        'h1': 2.8rem,
+        'h2': 2.4rem,
+        'h3': 2.0rem,
+        'h4': 1.8rem,
+        'h5': 1.7rem,
+        'h6': 1.6rem
 );
 // Reduction of headings font size on small screen and down
 $headings-font-size-sm-screen-reduction-factor: 0.2rem;
@@ -136,30 +136,30 @@ $headings-font-size-md-screen-reduction-factor: 0.15rem;
 
 // Main
 $about: (
-    'background': rgba(17, 26, 35, 0),
+        'background': rgba(17, 26, 35, 0),
 );
 
 // Header
 $header:(
-    'height':     55px,
-    'background': #fff,
-    'color':      #88909a,
-    'border':     1px solid #eef2f8
+        'height':     55px,
+        'background': #fff,
+        'color':      #88909a,
+        'border':     1px solid #eef2f8
 );
 
 // Sidebar
 $sidebar: (
-    'md-screen-width':  75px,
-    'lg-screen-width':  250px,
-    'xlg-screen-width': 500px,
-    'background':       rgba(17, 26, 35, 0),
-    'color':            #ebebeb
+        'md-screen-width':  75px,
+        'lg-screen-width':  250px,
+        'xlg-screen-width': 500px,
+        'background':       rgba(17, 26, 35, 0),
+        'color':            #ebebeb
 );
 
 // Main
 $main: (
-    'padding-top':      15px,
-    'background-color': #fff
+        'padding-top':      15px,
+        'background-color': #fff
 );
 
 // Components settings
@@ -168,50 +168,50 @@ $main: (
 
 // Highlight code
 $highlight: (
-    'background':  #f7f8f8,
-    'font-size':   1.4rem,
-    'border':      1px solid,
-    'line-height': 1.3em
+        'background':  #f7f8f8,
+        'font-size':   1.4rem,
+        'border':      1px solid,
+        'line-height': 1.3em
 );
 
 // Highlight colors
 // name of colors: http://www.color-blindness.com
 $highlight-colors: (
-    // Background
-    'white':           #fff,
-    // General color
-    'night-rider':     #333,
-    'bondi-blue':      #0086b3,
-    'persimmon':       #df5000,
-    'asparagus':       #63a35c,
-    // Comment
-    'pewter':          #969896,
-    'cardinal':        #a71d5d,
-    'scampi':          #795da3,
-    'bahama-blue':     #1d3e81,
-    'egyptian-blue':   #183691,
-    // Deletion color for .diff file
-    'free-speech-red': #bd2c00,
-    // Deletion background color for .diff file
-    'misty-rose':      #ffecec,
-    // Addition color for .diff file
-    'limeade':         #55a532,
-    // Addition background color for .diff file
-    'honeydew':        #eaffea
+  // Background
+        'white':           #fff,
+  // General color
+        'night-rider':     #333,
+        'bondi-blue':      #0086b3,
+        'persimmon':       #df5000,
+        'asparagus':       #63a35c,
+  // Comment
+        'pewter':          #969896,
+        'cardinal':        #a71d5d,
+        'scampi':          #795da3,
+        'bahama-blue':     #1d3e81,
+        'egyptian-blue':   #183691,
+  // Deletion color for .diff file
+        'free-speech-red': #bd2c00,
+  // Deletion background color for .diff file
+        'misty-rose':      #ffecec,
+  // Addition color for .diff file
+        'limeade':         #55a532,
+  // Addition background color for .diff file
+        'honeydew':        #eaffea
 );
 // Highlight text
 $highlight-text-bg-colors: (
-    'red':     lighten(red, 45%),
-    'green':   lighten(green, 65%),
-    'blue':    lighten(blue, 45%),
-    'purple':  lighten(purple, 70%),
-    'orange':  lighten(orange, 40%),
-    'yellow':  lighten(yellow, 40%),
-    'cyan':    lighten(cyan, 40%),
-    'primary': lighten(map-get($colors, 'primary'), 35%),
-    'success': lighten(map-get($colors, 'success'),35%),
-    'warning': lighten(map-get($colors, 'warning'), 40%),
-    'danger':  lighten(map-get($colors, 'danger'), 40%),
+        'red':     lighten(red, 45%),
+        'green':   lighten(green, 65%),
+        'blue':    lighten(blue, 45%),
+        'purple':  lighten(purple, 70%),
+        'orange':  lighten(orange, 40%),
+        'yellow':  lighten(yellow, 40%),
+        'cyan':    lighten(cyan, 40%),
+        'primary': lighten(map-get($colors, 'primary'), 35%),
+        'success': lighten(map-get($colors, 'success'),35%),
+        'warning': lighten(map-get($colors, 'warning'), 40%),
+        'danger':  lighten(map-get($colors, 'danger'), 40%),
 );
 // Image gallery photos
 // Space between 2 photos
@@ -219,8 +219,8 @@ $image-gallery-photos-margin: 2px;
 
 // Main content
 $main-content: (
-    'max-width':          750px,
-    'padding-right-left': 20px,
+        'max-width':          750px,
+        'padding-right-left': 20px,
 );
 
 // Mardown
@@ -229,12 +229,12 @@ $main-content: (
 // because they are larger than the post title or something like that
 // font-size : (X.Xrem = XXpx, 1.0rem = 10px)
 $markdown-headings-font-size: (
-    'h1': 3rem,
-    'h2': 2.7rem,
-    'h3': 2.4rem,
-    'h4': 2.1rem,
-    'h5': 1.9rem,
-    'h6': 1.7rem
+        'h1': 3rem,
+        'h2': 2.7rem,
+        'h3': 2.4rem,
+        'h4': 2.1rem,
+        'h5': 1.9rem,
+        'h6': 1.7rem
 );
 // Reduction of markdwon headings on small screen and down
 $markdown-headings-font-size-sm-screen-reduction-factor: 0.35rem;
@@ -251,10 +251,10 @@ $post-bottom-thumbnail-image-max-height: 250px;
 
 // Tooltip
 $tooltip: (
-    'min-width':    180px,
-    'background':   rgba(0, 0, 20, 0.93),
-    // Don't change this value, used to horizontally center the tooltip content
-    'arrow-width':  15px,
-    // Don't change this value, used to vertically center the tooltip content
-    'arrow-height': 12px
+        'min-width':    180px,
+        'background':   rgba(0, 0, 20, 0.93),
+  // Don't change this value, used to horizontally center the tooltip content
+        'arrow-width':  15px,
+  // Don't change this value, used to vertically center the tooltip content
+        'arrow-height': 12px
 );
