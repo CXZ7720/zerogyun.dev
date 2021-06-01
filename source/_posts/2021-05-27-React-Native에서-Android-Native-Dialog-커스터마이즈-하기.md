@@ -12,7 +12,7 @@ categories:
     - React Native
 ---
 
-Xcode 12.5 로 업데이트 되면서 발생한 React Native 빌드 에러를 해결하는 방법에 대해서 알아봅니다.
+React Native 에서 직접 커스터마이즈 하기 어려웠던 네이티브 컴포넌트인 `Alert()` 의 스타일을 변경하는 법에 대하여 알아봅니다.
 <!-- excerpt -->
 
 # 🍭 Android 의 Alert 커스터마이즈
