@@ -53,7 +53,7 @@ sidebar:
     about:
       title: global.about
       # url: "#about"
-      url: https://zerogyun.dev/portfolio
+      url: https://zerogyun.dev/resume
       icon: fa fa-question
   author_links:
     github:
