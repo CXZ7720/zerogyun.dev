@@ -107,7 +107,7 @@ theme: tranquilpeak
 robotstxt:
   useragent: "*"
   disallow:
-    - /portfolio/
+    - /resume/
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
