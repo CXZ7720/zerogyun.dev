@@ -4,8 +4,8 @@
 
 # Site
 title: 사다리타기
-subtitle: ''
-description: ''
+subtitle: 'devlog by zerogyun'
+description: '사다리를 올라가듯 한걸음씩 조심조심'
 keywords:
 author: zerogyun
 language: ko
@@ -25,10 +25,9 @@ pretty_urls:
   trailing_html: true # Set to false to remove trailing '.html' from permalinks
 # Auto-nofollow
 nofollow:
-    enable: true
-    exclude:
+  enable: false
+  exclude:
 
-      
 # Directory
 source_dir: source
 public_dir: public
@@ -38,10 +37,10 @@ category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
 skip_render:
-  - "profile/*"
-  - "taxi/*"
-  - "portfolio/*"
-  - "resume/*"
+  - 'profile/*'
+  - 'taxi/*'
+  - 'portfolio/*'
+  - 'resume/*'
 
 # Writing
 new_post_name: :year-:month-:day-:title.md # File name of new posts
@@ -108,9 +107,9 @@ ignore:
 theme: tranquilpeak
 
 robotstxt:
-  useragent: "*"
+  useragent: '*'
   disallow:
-    - /resume/
+    - /profile/
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
