@@ -221,18 +221,18 @@ gitalk:
   post_identifier: path
   # See all options: https://github.com/gitalk/gitalk#options
   options:
-    language: "en"
+    language: 'en'
     perPage: 10
     distractionFreeMode: false
     enableHotKey: true
-    pagerDirection: "first"
+    pagerDirection: 'first'
 
 # -------------------
 # Integrated services
 # -------------------
 
 # Your Google analystics web property ID : UA-XXXXX-X
-google_analytics_id: UA-126694602-3
+google_analytics_id:
 # Your Baidu analystics web property ID : 9505a5af654a2478f93fd6c0ae4f687d
 baidu_analytics_id:
 # Your Gravatar email. Overwrite `author.picture` everywhere in the blog
@@ -265,14 +265,14 @@ fb_app_id:
 # ```
 sharing_options:
   facebook:
-    icon: "fab fa-facebook"
-    url: "https://www.facebook.com/sharer/sharer.php?u={{post.permalink}}"
+    icon: 'fab fa-facebook'
+    url: 'https://www.facebook.com/sharer/sharer.php?u={{post.permalink}}'
   twitter:
-    icon: "fab fa-twitter"
-    url: "https://twitter.com/intent/tweet?text={{post.permalink}}"
+    icon: 'fab fa-twitter'
+    url: 'https://twitter.com/intent/tweet?text={{post.permalink}}'
   google_plus:
-    icon: "fab fa-google-plus"
-    url: "https://plus.google.com/share?url={{post.permalink}}"
+    icon: 'fab fa-google-plus'
+    url: 'https://plus.google.com/share?url={{post.permalink}}'
 # Business Social Networks
 #    linkedin:
 #        icon: "fab fa-linkedin"
