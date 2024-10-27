@@ -61,6 +61,7 @@ module.exports = {
       },
       fontFamily: {
         mono: ["IBM Plex Mono", "monospace"],
+        sans: ["KoddiUD OnGothic", 'sans-serif'],
       },
 
       typography: {
