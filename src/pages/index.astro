@@ -6,24 +6,21 @@ import Footer from "@components/Footer.astro";
 import LinkButton from "@components/LinkButton.astro";
 import Hr from "@components/Hr.astro";
 import Card from "@components/Card";
-import Socials from "@components/Socials.astro";
 import getSortedPosts from "@utils/getSortedPosts";
-import { SITE, SOCIALS } from "@config";
+import { SITE } from "@config";
 
 const posts = await getCollection("blog");
 
 const sortedPosts = getSortedPosts(posts);
 const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
 const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
-
-const socialCount = SOCIALS.filter(social => social.active).length;
 ---
 
 <Layout>
   <Header />
   <main id="main-content">
     <section id="hero">
-      <h1>Mingalaba</h1>
+      <h1>zerogyun</h1>
       <a
         target="_blank"
         href="/rss.xml"
@@ -42,29 +39,36 @@ const socialCount = SOCIALS.filter(social => social.active).length;
       </a>
 
       <p>
-        AstroPaper is a minimal, responsive, accessible and SEO-friendly Astro
-        blog theme. This theme follows best practices and provides accessibility
-        out of the box. Light and dark mode are supported by default. Moreover,
-        additional color schemes can also be configured.
+        프런트엔드 엔지니어. 가끔씩 모바일 클라이언트도, 가끔씩 서버도 다룹니다.<br
+        />
+        항상 왜 이렇게 해야하는지에 대한 합리적인 이유를 찾아내는걸 중요하게 생각합니다.<br
+        />
+        좋은 글을 많이 읽고 담아두는 곳으로 채우는게 목표입니다.<br />
       </p>
-      <p>
-        Read the blog posts or check
+      <p class="view-more-about-me">
         <LinkButton
-          className="underline decoration-dashed underline-offset-4 hover:text-skin-accent"
+          className="underline decoration-dashed underline-offset-8 hover:text-skin-accent"
           href="https://github.com/satnaing/astro-paper#readme"
         >
-          README
-        </LinkButton> for more info.
+          더 알아보기
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-right !w-4 !h-4"
+            ><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path
+              d="M5 12l14 0"></path><path d="M13 18l6 -6"></path><path
+              d="M13 6l6 6"></path></svg
+          >
+
+        </LinkButton>
       </p>
-      {
-        // only display if at least one social link is enabled
-        socialCount > 0 && (
-          <div class="social-wrapper">
-            <div class="social-links">Social Links:</div>
-            <Socials />
-          </div>
-        )
-      }
     </section>
 
     <Hr />
@@ -159,5 +163,9 @@ const socialCount = SOCIALS.filter(social => social.active).length;
   }
   .all-posts-btn-wrapper {
     @apply my-8 text-center;
+  }
+
+  .view-more-about-me {
+    @apply text-right;
   }
 </style>

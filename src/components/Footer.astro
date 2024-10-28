@@ -16,9 +16,12 @@ const { noMarginTop = false } = Astro.props;
   <div class="footer-wrapper">
     <Socials centered />
     <div class="copyright-wrapper">
-      <span>Copyright &#169; {currentYear}</span>
-      <span class="separator">&nbsp;|&nbsp;</span>
-      <span>All rights reserved.</span>
+      <span class="copyright-text">Copyright &#169; {currentYear}</span>
+      <span class="separator copyright-text">&nbsp;|&nbsp;</span>
+      <span class="copyright-text">All rights reserved.</span>
+    </div>
+    <div>
+      <span>Powered by Astro</span>
     </div>
   </div>
 </footer>
@@ -28,7 +31,7 @@ const { noMarginTop = false } = Astro.props;
     @apply w-full;
   }
   .footer-wrapper {
-    @apply flex flex-col items-center justify-between py-6 sm:flex-row-reverse sm:py-4;
+    @apply flex flex-col items-center justify-between py-6 sm:flex-row-reverse sm:py-4 mt-4 sm:mt-0;
   }
   .link-button {
     @apply my-1 p-2 hover:rotate-6;
@@ -41,5 +44,9 @@ const { noMarginTop = false } = Astro.props;
   }
   .separator {
     @apply hidden sm:inline;
+  }
+
+  .copyright-text {
+    @apply text-sm;
   }
 </style>
