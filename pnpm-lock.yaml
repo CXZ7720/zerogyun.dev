@@ -23,9 +23,18 @@ importers:
       fuse.js:
         specifier: ^7.0.0
         version: 7.0.0
+      install:
+        specifier: ^0.13.0
+        version: 0.13.0
       lodash.kebabcase:
         specifier: ^4.1.1
         version: 4.1.1
+      mdast-util-to-string:
+        specifier: ^4.0.0
+        version: 4.0.0
+      reading-time:
+        specifier: ^1.5.0
+        version: 1.5.0
       remark-collapse:
         specifier: ^0.1.2
         version: 0.1.2
@@ -1610,6 +1619,10 @@ packages:
     resolution: {integrity: sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==}
     engines: {node: '>=0.8.19'}
 
+  install@0.13.0:
+    resolution: {integrity: sha512-zDml/jzr2PKU9I8J/xyZBQn8rPCAY//UOYNmR01XwNwyfhEWObo2SWfSl1+0tm1u6PhxLwDnfsT/6jB7OUxqFA==}
+    engines: {node: '>= 0.10'}
+
   is-arrayish@0.3.2:
     resolution: {integrity: sha512-eVRqCvVlZbuw3GrM63ovNSNAeA1K16kaR/LRY/92w0zxQ5/1YzwblUX652i4Xs9RwAGjW9d9y6X88t8OaAJfWQ==}
 
@@ -2286,6 +2299,9 @@ packages:
   readdirp@4.0.2:
     resolution: {integrity: sha512-yDMz9g+VaZkqBYS/ozoBJwaBhTbZo3UNYQHNRw1D3UFQB8oHB4uS/tAODO+ZLjGWmUbKnIlOWO+aaIiAxrUWHA==}
     engines: {node: '>= 14.16.0'}
+
+  reading-time@1.5.0:
+    resolution: {integrity: sha512-onYyVhBNr4CmAxFsKS7bz+uTLRakypIe4R+5A824vBSkQy/hB3fZepoVEf8OVAxzLvK+H/jm9TzpI3ETSm64Kg==}
 
   regex-recursion@4.3.0:
     resolution: {integrity: sha512-5LcLnizwjcQ2ALfOj95MjcatxyqF5RPySx9yT+PaXu3Gox2vyAtLDjHB8NTJLtMGkvyau6nI3CfpwFCjPUIs/A==}
@@ -4562,6 +4578,8 @@ snapshots:
 
   imurmurhash@0.1.4: {}
 
+  install@0.13.0: {}
+
   is-arrayish@0.3.2:
     optional: true
 
@@ -5315,6 +5333,8 @@ snapshots:
       picomatch: 2.3.1
 
   readdirp@4.0.2: {}
+
+  reading-time@1.5.0: {}
 
   regex-recursion@4.3.0:
     dependencies:

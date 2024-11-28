@@ -24,6 +24,7 @@ const {
   canonicalURL,
   pubDatetime,
   modDatetime,
+  readingTime,
   tags,
   editPost,
 } = post.data;
@@ -49,6 +50,7 @@ const layoutProps = {
 
 /* ========== Prev/Next Posts ========== */
 
+console.log(posts.length)
 const allPosts = posts.map(({ data: { title }, slug }) => ({
   slug,
   title,
@@ -81,6 +83,7 @@ const nextPost =
     <Datetime
       pubDatetime={pubDatetime}
       modDatetime={modDatetime}
+      readingTime={readingTime}
       size="lg"
       className="my-2"
       editPost={editPost}
