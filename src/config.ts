@@ -4,12 +4,12 @@ export const SITE: Site = {
   website: "https://zerogyun.dev/", // replace this with your deployed domain
   author: "0.gyun",
   profile: "https://www.linkedin.com/in/zerogyun",
-  desc: "프론트앤드 개발자 0.gyun의 블로그입니다.",
+  desc: "프런트엔드 엔지니어 0.gyun의 블로그입니다.",
   title: "0.gyun's Blog",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
   postPerIndex: 4,
-  postPerPage: 3,
+  postPerPage: 8,
   scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
   showArchives: true,
   // editPost: {
@@ -34,7 +34,7 @@ export const LOGO_IMAGE = {
 export const SOCIALS: SocialObjects = [
   {
     name: "Github",
-    href: "https://github.com/zerogyun/zerogyun.dev",
+    href: "https://github.com/CXZ7720",
     linkTitle: ` ${SITE.title} on Github`,
     active: true,
   },
@@ -58,7 +58,7 @@ export const SOCIALS: SocialObjects = [
   },
   {
     name: "Mail",
-    href: "mailto:webmaster@zerogyun.dev",
+    href: "mailto:admin@zerogyun.dev",
     linkTitle: `Send an email to ${SITE.title}`,
     active: true,
   },
