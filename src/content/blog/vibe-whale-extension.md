@@ -9,12 +9,11 @@ tags:
   - WhaleBrower
   - ChromeExtension
   - VIBE
-description:
-  웨일 브라우저의 독특한 기능인 사이드바에서 동작하는 익스텐션을 제작한 내용을 기록합니다.
+description: 웨일 브라우저의 독특한 기능인 사이드바에서 동작하는 익스텐션을 제작한 내용을 기록합니다.
 ---
+
 Whale 브라우져는 크로미움 엔진을 기반으로 하여 구동되기 때문에 기존의 크롬 확장프로그램들과 대부분 호환됩니다.
 때문에 크롬 확장스트어에서 사용하던 앱 들을 웨일 브라우져에서 그대로 개발, 사용 할 수 있습니다.
-
 
 ### V1.0.0 - Initial Release
 
@@ -35,26 +34,24 @@ Whale 브라우져는 크로미움 엔진을 기반으로 하여 구동되기 �
 
 ```json
 {
+  "manifest_version": 2,
+  "name": "VIBE for Sidebar",
+  "version": "1.0.1",
 
-    "manifest_version": 2,
-    "name": "VIBE for Sidebar",
-    "version": "1.0.1",
+  "description": "VIBE 뮤직플레이어 for 사이드바",
+  "icons": {
+    "120": "images/new_120x120.png"
+  },
 
-
-    "description": "VIBE 뮤직플레이어 for 사이드바",
-    "icons": {
-        "120": "images/new_120x120.png"
-    },
-
-    "sidebar_action": {
-        "default_page": "index.html",
-        "default_title": "VIBE for Sidebar",
-        "use_navigation_bar": false,
-        "mobile_user_agent": true
-    }
+  "sidebar_action": {
+    "default_page": "index.html",
+    "default_title": "VIBE for Sidebar",
+    "use_navigation_bar": false,
+    "mobile_user_agent": true
+  }
 }
-
 ```
+
 위 코드는 Vibe Extension의 1.0.1 버전의 [`manifest.json` ](https://github.com/CXZ7720/Whale_Extension_VIBE/blob/master/manifest.json)이다.
 
 최상단에 manifest 문서의 버전과 App name, App Version 을 적어준다. Whale 확장프로그램의 경우 `manifest_version` 값은 2로 적어준다.
@@ -65,10 +62,9 @@ Whale 브라우져는 크로미움 엔진을 기반으로 하여 구동되기 �
 
 ![store_title](https://user-images.githubusercontent.com/29659112/76056274-7f723100-5fb9-11ea-999a-8b3260d43e1e.jpg)
 
+`icons` 는 중괄호로 묶어서 여러 사이즈를 정의 할 수 있다. whale 확장프로그램은 120 \* 120 으로 규격화된 아이콘만 업로드 가능하다.
 
-`icons` 는 중괄호로 묶어서 여러 사이즈를 정의 할 수 있다. whale 확장프로그램은 120 * 120 으로 규격화된 아이콘만 업로드 가능하다.
-
-`Sidebar_action` 섹션은 Whale 브라우저의 특화 기능인 사이드바에 삽입 될 확장프로그램의 액션을 정의하는 항목이다. 
+`Sidebar_action` 섹션은 Whale 브라우저의 특화 기능인 사이드바에 삽입 될 확장프로그램의 액션을 정의하는 항목이다.
 [여기](https://developers.whale.naver.com/api/sidebarAction/)에서 다양한 사이드바 액션 관련 json 키를 찾아 볼 수 있다.
 
 `default_page`의 경우 사이드바를 실행시켰을 때 처음 띄울 인트로 페이지를 정의한다. VIBE for Sidebar 의 경우 VIBE 사이트를 띄워주는것이 목표이기 때문에 index.html 속의 코드는 VIBE 메인 페이지로 리다이렉트 시켜주는 코드만이 들어있다.
@@ -76,18 +72,17 @@ Whale 브라우져는 크로미움 엔진을 기반으로 하여 구동되기 �
 `default_title`의 경우 사이드바에 커서를 올렸을 때 보여줄 이름값을 넣어준다.
 ![side_title](https://user-images.githubusercontent.com/29659112/76056272-7ed99a80-5fb9-11ea-9906-e8fb09f7e3bd.jpg)
 
-
-`use_navigation_bar` 키는 default 값으로 `True` 를 갖는다.  navigation_var는 아래 사진과 같이 뒤로가기, (default_page에서 정의된)홈으로 이동, 새 탭열기 등의 브라우져 액션을 수행한다. 네비게이션 바를 활성화 할 경우 콘텐츠 영역의 일부를 희생해야 한다. 이 앱의 경우에는 별도로 브라우저 액션을 컨트롤 할 필요가 없다고 판단하여 해당 값을 `false` 처리하였다.
+`use_navigation_bar` 키는 default 값으로 `True` 를 갖는다. navigation_var는 아래 사진과 같이 뒤로가기, (default_page에서 정의된)홈으로 이동, 새 탭열기 등의 브라우져 액션을 수행한다. 네비게이션 바를 활성화 할 경우 콘텐츠 영역의 일부를 희생해야 한다. 이 앱의 경우에는 별도로 브라우저 액션을 컨트롤 할 필요가 없다고 판단하여 해당 값을 `false` 처리하였다.
 
 ![navbar](https://user-images.githubusercontent.com/29659112/76056270-7e410400-5fb9-11ea-9b60-3246d1d3fc90.jpg)
 
-마지막으로 `mobile_user_agent` 값을 `True` 로 주어 Vibe의 모바일 페이지가 뜨도록 하여 Sidebar 에 적합한 UI를 띄우도록 하였다. 
+마지막으로 `mobile_user_agent` 값을 `True` 로 주어 Vibe의 모바일 페이지가 뜨도록 하여 Sidebar 에 적합한 UI를 띄우도록 하였다.
 
 개발문서를 확인해 보면 이 값에 따른 User Agent 값은 아래와 같이 나뉜다.
 
-|TRUE|False|
-|---|---|
-|Mozilla/5.0 (**Linux; Android 7.1.2; Nexus 6P Build/WHALE**)<br>AppleWebKit/537.36 (KHTML, like Gecko)<br>Chrome/65.0.3325.220 Whale/1.3.53.4<br>**Mobile** Safari/537.36 sidebar|Mozilla/5.0 (**Windows NT 6.1; Win64; x64**)<br>AppleWebKit/537.36 (KHTML, like Gecko)<br>Chrome/65.0.3325.220 Whale/1.3.53.4<br>Safari/537.36 sidebar|
+| TRUE                                                                                                                                                                              | False                                                                                                                                                  |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Mozilla/5.0 (**Linux; Android 7.1.2; Nexus 6P Build/WHALE**)<br>AppleWebKit/537.36 (KHTML, like Gecko)<br>Chrome/65.0.3325.220 Whale/1.3.53.4<br>**Mobile** Safari/537.36 sidebar | Mozilla/5.0 (**Windows NT 6.1; Win64; x64**)<br>AppleWebKit/537.36 (KHTML, like Gecko)<br>Chrome/65.0.3325.220 Whale/1.3.53.4<br>Safari/537.36 sidebar |
 
 `manifest.json`의 내용은 이정도가 전부이다.
 
@@ -102,7 +97,7 @@ Whale 브라우져는 크로미움 엔진을 기반으로 하여 구동되기 �
 때문에 공식앱인줄 알고 사용하던 대부분의 사용자들은 스토어 평점란에다가 VIBE의 기능부족에 대한 원성을 쏟아냈던 것이다.
 
 ![score](https://user-images.githubusercontent.com/29659112/76056271-7ed99a80-5fb9-11ea-835e-43123a456132.jpg)
-![comment](https://user-images.githubusercontent.com/29659112/76056265-7c774080-5fb9-11ea-94c9-54b76ea70dde.jpg)*VIBE 시스템 자체의 기능 부재에 대한 원성. 대부분 기능추가 요구이다.*
+![comment](https://user-images.githubusercontent.com/29659112/76056265-7c774080-5fb9-11ea-94c9-54b76ea70dde.jpg)_VIBE 시스템 자체의 기능 부재에 대한 원성. 대부분 기능추가 요구이다._
 
 나 또한 해결해 주고 싶은 마음이 굴뚝같아서 Vibe 측에 url 쿼리로 별도로 구현할 수 있는 방법이 없는지 까지 물어보았을 정도다.
 
@@ -145,12 +140,11 @@ Whale 브라우져는 크로미움 엔진을 기반으로 하여 구동되기 �
 우선적으로 해야 할 일은 확장프로그램 레포지토리를 좀 다듬어야 할 것 같다.
 개발 당시에는 중간고사 기간동안 틈틈히 머리식힐 겸 만들어 본 거라 `Readme.md`도 없고 릴리즈에만 치중했다. 기말고사 기간이 다가오기 전에 마음 단단히 먹고 `Readme.md`와 릴리즈 노트를 정리해서 커밋하는게 목표이다.
 
-
 #### <참고>
-* Vibe for Sidebar Github : [https://github.com/CXZ7720/Whale_Extension_VIBE](https://github.com/CXZ7720/Whale_Extension_VIBE)
 
-* Vibe for Sidebar 웨일스토어 페이지 : [https://store.whale.naver.com/detail/bjbfokfonchicpenohpmngbbkpgmbobg](https://store.whale.naver.com/detail/bjbfokfonchicpenohpmngbbkpgmbobg)
+- Vibe for Sidebar Github : [https://github.com/CXZ7720/Whale_Extension_VIBE](https://github.com/CXZ7720/Whale_Extension_VIBE)
 
+- Vibe for Sidebar 웨일스토어 페이지 : [https://store.whale.naver.com/detail/bjbfokfonchicpenohpmngbbkpgmbobg](https://store.whale.naver.com/detail/bjbfokfonchicpenohpmngbbkpgmbobg)
 
 **19.12.22 추가**
 
@@ -167,13 +161,14 @@ Whale 브라우져는 크로미움 엔진을 기반으로 하여 구동되기 �
 먼저 VIBE 의 서비스를 나 또한 "이용" 한 것이기 때문에, 서비스 제공자의 요청이 결코 잘못된 것은 아니라고 결론내렸다. 또한 앱 평점에서 보았듯, 공식앱이 아닌데도 사용자들은 공식앱인줄 알고 혼동하여 내 앱에 다양한 피드백을 쏟아내고 있는 실정이었다. 이 또한 개발진 입장에서는 피드백 창구가 다원화되고, 제대로 수렴할 수 없기 때문에 문제였을 것이다.
 
 그리고 가장 크게 다가온 것은, 한 선배님의 말씀이었는데,
+
 > 개발자는 다운로드 수가 아닌 코드로 승부해야한다. 너가 개발자지, 운영진은 아니잖아?
 
 라고 하셨다. 솔직히 6000이라는 다운로드 숫자가 아쉬웠던 것은 사실이다. 그런데 저 말씀을 듣고나니 비로소 복잡했던 마음을 정리할 수 있었다. 여러 상황적 요소를 고려했을 때, 불필요한 미련을 버리고 잘 짜여진 새로운 아이템으로 스토어에 출시하는게 개발자로써 맞다고 생각하게 되었다.
 
 결국 며칠 전 웨일브라우저 팀에 앱을 내리겠다는 뜻을 전달했고, 앱을 미공개 처리했다.
 
-잘 돌아가는 서비를 중단하는것은 안타까운 일이지만, 그래도 이번 일을 통해 큰 서비스를 운영하면서 다양한 경험을 할 수 있었다. (개발자의 예상을 뛰어넘는 유저와, 원작자의 문제제기) 
+잘 돌아가는 서비를 중단하는것은 안타까운 일이지만, 그래도 이번 일을 통해 큰 서비스를 운영하면서 다양한 경험을 할 수 있었다. (개발자의 예상을 뛰어넘는 유저와, 원작자의 문제제기)
 이번 일을 경험삼아 더 좋은 아이디어로 앱을 출시해야겠다는 다짐을 해본다.
 
 제가 등록한 앱은 "미공개" 상태이기 때문에 다음 링크로 직접 접속하시면 사용할 수 있습니다.

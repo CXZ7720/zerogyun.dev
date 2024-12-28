@@ -14,12 +14,11 @@ title: "About"
 
 ## Tech Stack
 
-Typescript, React, Next.js, Node.js
-
+Typescript, React, Next.js, Node.js, React Native
 
 ## Contact
 
-* Email: admin@zerogyun.dev
-* LinkedIn: https://www.linkedin.com/in/zerogyun
-* Github: https://github.com/CXZ7720
-
+- Email: admin@zerogyun.dev
+- LinkedIn: https://www.linkedin.com/in/zerogyun
+- Github: https://github.com/CXZ7720
+- Resume: https://read.cv/zerogyun

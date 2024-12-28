@@ -7,7 +7,6 @@ import sitemap from "@astrojs/sitemap";
 import { SITE } from "./src/config";
 import { remarkReadingTime } from "./src/utils/remark-reading-time.mjs"; // make sure your relative path is correct
 
-
 // https://astro.build/config
 export default defineConfig({
   site: SITE.website,

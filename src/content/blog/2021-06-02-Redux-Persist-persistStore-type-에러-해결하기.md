@@ -5,13 +5,11 @@ slug: fix-redux-persist-type-error
 featured: false
 draft: false
 tags:
-    - React
-    - Redux
-    - Redux-Persist
-description:
-  Redux와 Redux-Persist를 사용할 때 발생하는 Type Error 해결법입니다.
+  - React
+  - Redux
+  - Redux-Persist
+description: Redux와 Redux-Persist를 사용할 때 발생하는 Type Error 해결법입니다.
 ---
-
 
 ## 💣 문제
 
@@ -23,11 +21,10 @@ description:
 
 대충 읽어보니 Store의 Type 으로 EmptyObject라는 못보던 타입이 하나 추가되었네요. 결과적으로는 `AnyAction` 타입이 없다는 에러입니다.
 
-
 ## 🎉 해결
 
-* 관련 이슈 : [https://github.com/rt2zz/redux-persist/issues/1140#issuecomment-590868279](https://github.com/rt2zz/redux-persist/issues/1140#issuecomment-590868279)
-* 관련 PR : [https://github.com/rt2zz/redux-persist/pull/1278](https://github.com/rt2zz/redux-persist/pull/1278)
+- 관련 이슈 : [https://github.com/rt2zz/redux-persist/issues/1140#issuecomment-590868279](https://github.com/rt2zz/redux-persist/issues/1140#issuecomment-590868279)
+- 관련 PR : [https://github.com/rt2zz/redux-persist/pull/1278](https://github.com/rt2zz/redux-persist/pull/1278)
 
 이미 관련하여 이슈가 열려있었습니다.
 가장 많은 Up vote 를 받은 댓글에서는 PersistStore 에 RootState라는 타입을 명시해주면 된다고 합니다.

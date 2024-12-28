@@ -4,16 +4,14 @@ import PostDetails from "@layouts/PostDetails.astro";
 import getSortedPosts from "@utils/getSortedPosts";
 import getPostsWithRT from "@utils/getPostsWithRT";
 
-
 export interface Props {
   post: CollectionEntry<"blog">;
 }
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }) => !data.draft);
-  
-  const postsWithRT = await getPostsWithRT(posts); // replace reading time logic with this func
 
+  const postsWithRT = await getPostsWithRT(posts); // replace reading time logic with this func
 
   const postResult = postsWithRT.map(post => ({
     params: { slug: post.slug },
