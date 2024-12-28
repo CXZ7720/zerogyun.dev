@@ -14,7 +14,7 @@ title: "About"
 
 ## Tech Stack
 
-Typescript, React, Next.js, Node.js, React Native
+Typescript, React, Next.js, GraphQL, Node.js, React Native, Docker, AWS
 
 ## Contact
 
