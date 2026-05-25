@@ -1,46 +1,69 @@
-import { defineConfig } from "astro/config";
-import tailwind from "@astrojs/tailwind";
-import react from "@astrojs/react";
+import {
+  defineConfig,
+  envField,
+  svgoOptimizer,
+} from "astro/config";
+import tailwindcss from "@tailwindcss/vite";
+import mdx from "@astrojs/mdx";
+import sitemap from "@astrojs/sitemap";
 import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
-import sitemap from "@astrojs/sitemap";
-import { SITE } from "./src/config";
-import { remarkReadingTime } from "./src/utils/remark-reading-time.mjs"; // make sure your relative path is correct
+import {
+  transformerNotationDiff,
+  transformerNotationHighlight,
+  transformerNotationWordHighlight,
+} from "@shikijs/transformers";
+import { transformerFileName } from "./src/utils/transformers/fileName";
+import { remarkReadingTime } from "./src/utils/remark-reading-time.mjs";
+import config from "./astro-paper.config";
 
-// https://astro.build/config
 export default defineConfig({
-  site: SITE.website,
+  site: config.site.url,
   integrations: [
-    tailwind({
-      applyBaseStyles: false,
+    mdx(),
+    sitemap({
+      filter: page =>
+        config.features?.showArchives !== false || !page.endsWith("/archives/"),
     }),
-    react(),
-    sitemap(),
   ],
+  i18n: {
+    locales: ["ko"],
+    defaultLocale: "ko",
+    routing: {
+      prefixDefaultLocale: false,
+    },
+  },
   markdown: {
     remarkPlugins: [
       remarkToc,
       remarkReadingTime,
-      [
-        remarkCollapse,
-        {
-          test: "Table of contents",
-        },
-      ],
+      [remarkCollapse, { test: "Table of contents" }],
     ],
     shikiConfig: {
-      // For more themes, visit https://shiki.style/themes
       themes: { light: "min-light", dark: "night-owl" },
-      wrap: true,
+      defaultColor: false,
+      wrap: false,
+      transformers: [
+        transformerFileName({ style: "v2", hideDot: false }),
+        transformerNotationHighlight(),
+        transformerNotationWordHighlight(),
+        transformerNotationDiff({ matchAlgorithm: "v3" }),
+      ],
     },
   },
   vite: {
-    optimizeDeps: {
-      exclude: ["@resvg/resvg-js"],
+    plugins: [tailwindcss()],
+  },
+  env: {
+    schema: {
+      PUBLIC_GOOGLE_SITE_VERIFICATION: envField.string({
+        access: "public",
+        context: "client",
+        optional: true,
+      }),
     },
   },
-  scopedStyleStrategy: "where",
   experimental: {
-    contentLayer: true,
+    svgOptimizer: svgoOptimizer(),
   },
 });
