@@ -22,6 +22,9 @@ pnpm-debug.log*
 # ignore .astro directory
 .astro
 
+# pagefind
+public/pagefind
+
 # yarn
 .yarn/*
 !.yarn/patches
