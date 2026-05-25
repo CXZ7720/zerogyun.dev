@@ -33,3 +33,6 @@ public/pagefind
 !.yarn/sdks
 !.yarn/versions
 .pnp.*
+
+# omc
+.omc/
