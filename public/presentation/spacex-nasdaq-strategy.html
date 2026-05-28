@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MISSION SPCX · 나스닥 편입 전략 관제</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#05070d;
+    --deep:#0a0e17;
+    --panel:#0e1320;
+    --panel-2:#131a2b;
+    --line:#1e2740;
+    --line-bright:#2f3c63;
+    --ink:#e8edf7;
+    --ink-dim:#8e9bb8;
+    --ink-faint:#586585;
+    --flame:#ff6b1a;
+    --flame-bright:#ff9347;
+    --go:#00e08a;
+    --go-dim:#0a6b48;
+    --warn:#ffc24b;
+    --abort:#ff3b54;
+    --plasma:#5b8cff;
+    --shadow:0 24px 60px -20px rgba(0,0,0,.8);
+    --grid:rgba(91,140,255,.045);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box}
+
+  html{scroll-behavior:smooth}
+
+  body{
+    background:var(--void);
+    color:var(--ink);
+    font-family:'JetBrains Mono',monospace;
+    line-height:1.6;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ===== Atmospheric background ===== */
+  .starfield{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .starfield::before{
+    content:"";position:absolute;inset:0;
+    background:
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.7), transparent),
+      radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.5px 1.5px at 80% 20%, rgba(255,255,255,.6), transparent),
+      radial-gradient(1px 1px at 35% 85%, rgba(255,255,255,.4), transparent),
+      radial-gradient(1px 1px at 90% 55%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.5px 1.5px at 10% 60%, rgba(255,255,255,.4), transparent),
+      radial-gradient(1px 1px at 50% 15%, rgba(255,255,255,.5), transparent);
+    background-size:cover;
+    animation:twinkle 8s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle{from{opacity:.5}to{opacity:1}}
+  .glow{
+    position:fixed;z-index:0;pointer-events:none;border-radius:50%;filter:blur(120px);
+  }
+  .glow.a{width:600px;height:600px;background:radial-gradient(circle,rgba(255,107,26,.16),transparent 70%);top:-200px;right:-150px}
+  .glow.b{width:700px;height:700px;background:radial-gradient(circle,rgba(91,140,255,.12),transparent 70%);bottom:-300px;left:-200px}
+  .gridlines{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:48px 48px;
+    mask-image:radial-gradient(ellipse 100% 80% at 50% 0%,#000 40%,transparent 100%);
+  }
+
+  .wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px}
+
+  /* ===== Header / Launch console ===== */
+  header{padding:64px 0 40px;position:relative}
+  .mission-tag{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:11px;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--flame-bright);border:1px solid rgba(255,107,26,.35);
+    padding:7px 14px;border-radius:2px;background:rgba(255,107,26,.06);
+    margin-bottom:28px;
+  }
+  .mission-tag .pulse{width:7px;height:7px;border-radius:50%;background:var(--flame);box-shadow:0 0 10px var(--flame);animation:beat 1.4s ease-in-out infinite}
+  @keyframes beat{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+  h1{
+    font-family:'Chakra Petch',sans-serif;font-weight:700;
+    font-size:clamp(38px,7vw,82px);line-height:.96;letter-spacing:-.01em;
+    text-transform:uppercase;margin-bottom:18px;
+  }
+  h1 .line2{display:block;color:transparent;-webkit-text-stroke:1.5px var(--flame);background:linear-gradient(180deg,var(--flame-bright),var(--flame));-webkit-background-clip:text;background-clip:text;-webkit-text-stroke:0}
+  h1 .stroke{display:block;color:transparent;-webkit-text-stroke:1.5px var(--ink-faint)}
+
+  .subtitle{color:var(--ink-dim);max-width:620px;font-size:15px;margin-bottom:36px}
+
+  .console{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  .readout{background:var(--panel);padding:20px 22px;position:relative}
+  .readout .k{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px}
+  .readout .v{font-family:'Chakra Petch',sans-serif;font-size:28px;font-weight:700;line-height:1}
+  .readout .v small{font-size:13px;color:var(--ink-dim);font-weight:500}
+  .readout.accent .v{color:var(--flame-bright)}
+  .readout.go .v{color:var(--go)}
+  .readout.abort .v{color:var(--abort)}
+
+  /* ===== Section scaffolding ===== */
+  section{padding:56px 0;position:relative}
+  .sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:8px}
+  .sec-num{font-family:'Chakra Petch',sans-serif;font-size:13px;color:var(--flame);letter-spacing:.2em;font-weight:600}
+  .sec-title{font-family:'Chakra Petch',sans-serif;font-size:clamp(22px,3.5vw,32px);font-weight:600;text-transform:uppercase;letter-spacing:.01em}
+  .sec-desc{color:var(--ink-dim);font-size:14px;max-width:640px;margin-bottom:36px;padding-left:0}
+  .divider{height:1px;background:linear-gradient(90deg,var(--flame),transparent);margin-bottom:32px;opacity:.5}
+
+  /* ===== Thesis flow ===== */
+  .flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px}
+  .flow-node{
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px;
+    position:relative;transition:.25s;
+  }
+  .flow-node:hover{border-color:var(--line-bright);transform:translateY(-3px)}
+  .flow-node .step{font-size:10px;color:var(--flame);letter-spacing:.15em;margin-bottom:10px}
+  .flow-node .body{font-size:13px;color:var(--ink)}
+  .flow-node .body b{color:var(--flame-bright);font-weight:700}
+  .flow-arrow{display:flex;align-items:center;justify-content:center;color:var(--ink-faint);font-size:20px}
+
+  /* ===== Timeline ===== */
+  .timeline{position:relative;margin-top:8px}
+  .tl-spine{position:absolute;left:26px;top:14px;bottom:14px;width:2px;background:linear-gradient(180deg,var(--ink-faint),var(--flame) 35%,var(--go) 55%,var(--abort) 100%);opacity:.55}
+  .phase{position:relative;padding-left:72px;margin-bottom:14px;cursor:pointer}
+  .phase-dot{position:absolute;left:18px;top:18px;width:18px;height:18px;border-radius:50%;background:var(--deep);border:2px solid var(--ink-faint);z-index:2;transition:.25s}
+  .phase[data-tone="wait"] .phase-dot{border-color:var(--ink-dim)}
+  .phase[data-tone="go"] .phase-dot{border-color:var(--go);box-shadow:0 0 0 4px rgba(0,224,138,.12)}
+  .phase[data-tone="peak"] .phase-dot{border-color:var(--flame);box-shadow:0 0 0 4px rgba(255,107,26,.14)}
+  .phase[data-tone="exit"] .phase-dot{border-color:var(--warn);box-shadow:0 0 0 4px rgba(255,194,75,.12)}
+  .phase[data-tone="abort"] .phase-dot{border-color:var(--abort);box-shadow:0 0 0 4px rgba(255,59,84,.14)}
+  .phase.open .phase-dot{transform:scale(1.25)}
+
+  .phase-card{background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow:hidden;transition:.25s}
+  .phase:hover .phase-card{border-color:var(--line-bright)}
+  .phase.open .phase-card{border-color:var(--line-bright);box-shadow:var(--shadow)}
+  .phase-top{display:flex;align-items:center;gap:16px;padding:16px 20px;flex-wrap:wrap}
+  .phase-date{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:15px;color:var(--ink);min-width:96px}
+  .phase-name{flex:1;font-size:14px;color:var(--ink-dim);min-width:160px}
+  .phase-name b{color:var(--ink);font-weight:700}
+  .badge{font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border-radius:3px;font-weight:700;white-space:nowrap}
+  .badge.wait{background:rgba(142,155,184,.12);color:var(--ink-dim);border:1px solid rgba(142,155,184,.25)}
+  .badge.go{background:rgba(0,224,138,.1);color:var(--go);border:1px solid rgba(0,224,138,.3)}
+  .badge.peak{background:rgba(255,107,26,.1);color:var(--flame-bright);border:1px solid rgba(255,107,26,.3)}
+  .badge.exit{background:rgba(255,194,75,.1);color:var(--warn);border:1px solid rgba(255,194,75,.3)}
+  .badge.abort{background:rgba(255,59,84,.1);color:var(--abort);border:1px solid rgba(255,59,84,.3)}
+
+  .phase-detail{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1)}
+  .phase.open .phase-detail{max-height:420px}
+  .phase-detail-inner{padding:0 20px 20px;border-top:1px solid var(--line);margin-top:0;padding-top:18px}
+  .pd-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:640px){.pd-grid{grid-template-columns:1fr}}
+  .pd-block .pd-label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px}
+  .pd-block p{font-size:13px;color:var(--ink-dim)}
+  .pd-block p b{color:var(--ink)}
+  .pd-action{display:inline-block;margin-top:4px;font-size:13px;padding:8px 12px;border-radius:4px;border-left:3px solid;background:var(--panel-2)}
+  .pd-action.go{border-color:var(--go);color:var(--go)}
+  .pd-action.peak{border-color:var(--flame);color:var(--flame-bright)}
+  .pd-action.exit{border-color:var(--warn);color:var(--warn)}
+  .pd-action.abort{border-color:var(--abort);color:var(--abort)}
+  .pd-action.wait{border-color:var(--ink-dim);color:var(--ink-dim)}
+  .hint{font-size:11px;color:var(--ink-faint);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+  .hint::before{content:"▸";color:var(--flame)}
+
+  /* ===== Simulator ===== */
+  .sim{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:28px;box-shadow:var(--shadow)}
+  .sim-control{margin-bottom:28px}
+  .sim-control .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+  .sim-control label{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim)}
+  .sim-val{font-family:'Chakra Petch',sans-serif;font-size:32px;font-weight:700}
+  .sim-val.pos{color:var(--go)}
+  .sim-val.neg{color:var(--abort)}
+  input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--abort),var(--ink-faint) 50%,var(--go));outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--flame);cursor:pointer;border:3px solid var(--deep);box-shadow:0 0 14px rgba(255,107,26,.7);transition:.15s}
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--flame);cursor:pointer;border:3px solid var(--deep);box-shadow:0 0 14px rgba(255,107,26,.7)}
+  .scale-marks{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-faint);margin-top:8px}
+
+  .sim-out{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:560px){.sim-out{grid-template-columns:1fr}}
+  .etf-card{background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:20px;position:relative;overflow:hidden;transition:.2s}
+  .etf-card .lev{font-size:10px;letter-spacing:.12em;color:var(--ink-faint);text-transform:uppercase}
+  .etf-card .ticker{font-family:'Chakra Petch',sans-serif;font-size:22px;font-weight:700;margin:4px 0 16px}
+  .etf-card .ret{font-family:'Chakra Petch',sans-serif;font-size:34px;font-weight:700;line-height:1;transition:.2s}
+  .etf-card .bar-track{height:6px;background:var(--line);border-radius:3px;margin-top:16px;overflow:hidden;position:relative}
+  .etf-card .bar-fill{position:absolute;top:0;bottom:0;left:50%;transition:.3s cubic-bezier(.4,0,.2,1);border-radius:3px}
+  .etf-card.qqq{opacity:.85}
+  .etf-card .note{font-size:11px;color:var(--ink-faint);margin-top:12px;min-height:30px}
+  .sim-warn{margin-top:20px;font-size:12px;color:var(--warn);padding:12px 16px;background:rgba(255,194,75,.07);border:1px solid rgba(255,194,75,.2);border-radius:5px;display:none}
+  .sim-warn.show{display:block}
+
+  /* ===== Decay demo ===== */
+  .decay{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+  @media(max-width:640px){.decay{grid-template-columns:1fr}}
+  .decay-card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:22px}
+  .decay-card h4{font-family:'Chakra Petch',sans-serif;font-size:14px;letter-spacing:.05em;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+  .decay-card .seq{font-size:12px;color:var(--ink-dim);margin:14px 0;line-height:2}
+  .decay-card .seq .arr{color:var(--flame)}
+  .decay-card .result{font-family:'Chakra Petch',sans-serif;font-size:24px;font-weight:700}
+  .decay-card .lbl{font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em}
+  .x2{color:var(--go)} .x3{color:var(--abort)}
+
+  /* ===== Risk matrix (S-1) ===== */
+  .risks{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+  .risk{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--abort);border-radius:6px;padding:18px 20px;transition:.2s}
+  .risk:hover{transform:translateY(-3px);border-left-color:var(--flame)}
+  .risk .rh{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .risk .rn{font-family:'Chakra Petch',sans-serif;font-size:18px;font-weight:700;color:var(--abort)}
+  .risk .rt{font-size:13px;font-weight:700;color:var(--ink)}
+  .risk p{font-size:12px;color:var(--ink-dim)}
+  .risk .metric{font-family:'Chakra Petch',sans-serif;color:var(--flame-bright);font-weight:700}
+
+  /* ===== Financial snapshot ===== */
+  .fin{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .fin .cell{background:var(--panel);padding:18px 20px}
+  .fin .cell .fk{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px}
+  .fin .cell .fv{font-family:'Chakra Petch',sans-serif;font-size:24px;font-weight:700}
+  .fin .cell .fv.bad{color:var(--abort)} .fin .cell .fv.good{color:var(--go)} .fin .cell .fv.warn{color:var(--warn)}
+  .fin .cell .fsub{font-size:11px;color:var(--ink-faint);margin-top:4px}
+
+  /* ===== Verdict ===== */
+  .verdict{background:linear-gradient(135deg,var(--panel-2),var(--panel));border:1px solid var(--line-bright);border-radius:10px;padding:36px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+  .verdict::before{content:"";position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,107,26,.15),transparent 70%);border-radius:50%}
+  .verdict .vlabel{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--flame);margin-bottom:16px}
+  .verdict .vmain{font-family:'Chakra Petch',sans-serif;font-size:clamp(20px,3vw,28px);font-weight:600;line-height:1.4;margin-bottom:20px}
+  .verdict .vmain .hl{color:var(--flame-bright)}
+  .verdict .vmain .go{color:var(--go)} .verdict .vmain .ab{color:var(--abort)}
+  .verdict ul{list-style:none;display:grid;gap:12px}
+  .verdict li{font-size:14px;color:var(--ink-dim);padding-left:24px;position:relative}
+  .verdict li::before{content:"◢";position:absolute;left:0;color:var(--flame);font-size:11px;top:4px}
+  .verdict li b{color:var(--ink)}
+
+  /* ===== Disclaimer ===== */
+  .disclaimer{margin:40px 0 0;padding:20px 24px;border:1px dashed var(--line-bright);border-radius:6px;background:rgba(255,59,84,.04)}
+  .disclaimer .dt{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--abort);margin-bottom:10px;font-weight:700}
+  .disclaimer p{font-size:12px;color:var(--ink-faint);line-height:1.7}
+
+  footer{padding:40px 0 64px;text-align:center;color:var(--ink-faint);font-size:11px;letter-spacing:.1em}
+  footer .sources{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center}
+  footer a{color:var(--ink-dim);text-decoration:none;border-bottom:1px solid var(--line)}
+  footer a:hover{color:var(--flame-bright)}
+
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
+  .reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="starfield"></div>
+<div class="glow a"></div>
+<div class="glow b"></div>
+<div class="gridlines"></div>
+
+<div class="wrap">
+
+  <!-- ============ HEADER ============ -->
+  <header>
+    <div class="mission-tag"><span class="pulse"></span>Mission Control · NASDAQ-100 인덱스 편입 작전</div>
+    <h1>
+      <span class="stroke">OPERATION</span>
+      <span class="line2">SPCX WAVE</span>
+    </h1>
+    <p class="subtitle">SpaceX 상장 → 패스트 엔트리 편입 → 패시브 ETF 의무 매수. 수급 불균형이 만드는 단기 파도를 레버리지 ETF로 타기 위한 관제 콘솔. 모든 분석은 S-1 공시와 공개 보도 기반.</p>
+
+    <div class="console">
+      <div class="readout accent">
+        <div class="k">상장 D-Day</div>
+        <div class="v" id="dday">D-14</div>
+      </div>
+      <div class="readout">
+        <div class="k">티커</div>
+        <div class="v">SPCX</div>
+      </div>
+      <div class="readout">
+        <div class="k">목표 밸류</div>
+        <div class="v">$1.75<small>T</small></div>
+      </div>
+      <div class="readout go">
+        <div class="k">진입 윈도우</div>
+        <div class="v">06.13<small> →</small></div>
+      </div>
+      <div class="readout abort">
+        <div class="k">청산 데드라인</div>
+        <div class="v">07.03</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ 01 THESIS ============ -->
+  <section class="reveal">
+    <div class="sec-head"><span class="sec-num">01</span><span class="sec-title">왜 파도가 치는가</span></div>
+    <div class="divider"></div>
+    <p class="sec-desc">패시브 ETF는 인덱스를 기계적으로 복제한다. 거대 신규 종목이 편입되면 가격과 무관하게 의무 매수가 발생하고, 유동 물량이 적을수록 가격은 더 강하게 튄다.</p>
+    <div class="flow">
+      <div class="flow-node"><div class="step">01 / 상장</div><div class="body"><b>SpaceX</b> 나스닥 상장 (SPCX)</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="step">02 / 룰</div><div class="body"><b>패스트 엔트리</b> — 15거래일 만에 편입</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="step">03 / 수요</div><div class="body">QQQ 등 ETF <b>의무 매수</b> 발생</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="step">04 / 수급</div><div class="body">유동주식 <b>10% 미만</b> → 공급 희소</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="step">05 / 결과</div><div class="body"><b>가격 급등</b> → 나스닥 ETF 상승</div></div>
+    </div>
+  </section>
+
+  <!-- ============ 02 TIMELINE ============ -->
+  <section class="reveal">
+    <div class="sec-head"><span class="sec-num">02</span><span class="sec-title">미션 타임라인</span></div>
+    <div class="divider"></div>
+    <p class="sec-desc">상장부터 락업 해제까지 전 구간을 페이즈로 분해했다. 각 페이즈를 눌러 대응 지침을 확인하라.</p>
+    <p class="hint">각 페이즈를 클릭하면 상세 대응 전략이 펼쳐집니다</p>
+
+    <div class="timeline">
+      <div class="tl-spine"></div>
+
+      <div class="phase" data-tone="wait">
+        <div class="phase-dot"></div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <span class="phase-date">06.05</span>
+            <span class="phase-name">투자자 <b>로드쇼</b> 시작 · 기관 수요 확인</span>
+            <span class="badge wait">관망</span>
+          </div>
+          <div class="phase-detail"><div class="phase-detail-inner"><div class="pd-grid">
+            <div class="pd-block"><div class="pd-label">시장 상황</div><p>기관 수요(오버부킹 배수)가 공개 분위기를 좌우. 방향성 아직 불확실.</p></div>
+            <div class="pd-block"><div class="pd-label">대응</div><div class="pd-action wait">진입 보류 · 수요 온도만 측정. Starship Flight 12 일정 주시.</div></div>
+          </div></div></div>
+        </div>
+      </div>
+
+      <div class="phase" data-tone="wait">
+        <div class="phase-dot"></div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <span class="phase-date">06.11</span>
+            <span class="phase-name">IPO <b>공모가 확정</b> · 가격 발견</span>
+            <span class="badge wait">관망</span>
+          </div>
+          <div class="phase-detail"><div class="phase-detail-inner"><div class="pd-grid">
+            <div class="pd-block"><div class="pd-label">시장 상황</div><p>수요 폭발 시 공모가 상단 초과 가능. 멀티플 부담 여부 판단 분기점.</p></div>
+            <div class="pd-block"><div class="pd-label">대응</div><div class="pd-action wait">공모가가 밸류 부담을 키우는지 확인. 여전히 관망.</div></div>
+          </div></div></div>
+        </div>
+      </div>
+
+      <div class="phase" data-tone="abort">
+        <div class="phase-dot"></div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <span class="phase-date">06.12</span>
+            <span class="phase-name"><b>SPCX 상장</b> (D+0) · 변동성 최대 · 락업 시작</span>
+            <span class="badge abort">고변동</span>
+          </div>
+          <div class="phase-detail"><div class="phase-detail-inner"><div class="pd-grid">
+            <div class="pd-block"><div class="pd-label">시장 상황</div><p>상장 첫날은 양방향으로 가장 크게 출렁임. "따상 후 밀림" 패턴 흔함. 레버리지 ETF가 휩쓸리기 쉬운 날.</p></div>
+            <div class="pd-block"><div class="pd-label">대응</div><div class="pd-action abort">당일 신규 진입 자제. 방향 확정 전 휩쓸림 위험.</div></div>
+          </div></div></div>
+        </div>
+      </div>
+
+      <div class="phase open" data-tone="go">
+        <div class="phase-dot"></div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <span class="phase-date">06.13~16</span>
+            <span class="phase-name"><b>진입 윈도우</b> · 상장 변동성 진정 후 추세 확인</span>
+            <span class="badge go">진입</span>
+          </div>
+          <div class="phase-detail"><div class="phase-detail-inner"><div class="pd-grid">
+            <div class="pd-block"><div class="pd-label">시장 상황</div><p>편입 기대가 상승 추세를 형성하기 시작. "buy the rumor" 구간의 출발점.</p></div>
+            <div class="pd-block"><div class="pd-label">대응</div><div class="pd-action go">QLD/TQQQ 1차 분할 진입. 손절선(QLD -10~12% / TQQQ -8%) 동시 설정.</div></div>
+          </div></div></div>
+        </div>
+      </div>
+
+      <div class="phase" data-tone="go">
+        <div class="phase-dot"></div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <span class="phase-date">06.23</span>
+            <span class="phase-name">D+7 · 패스트 엔트리 <b>심사 시작</b></span>
+            <span class="badge go">보유</span>
+          </div>
+          <div class="phase-detail"><div class="phase-detail-inner"><div class="pd-grid">
+            <div class="pd-block"><div class="pd-label">시장 상황</div><p>편입 자격 심사 개시. 기대감이 가격에 반영되며 추세 강화 가능.</p></div>
+            <div class="pd-block"><div class="pd-label">대응</div><div class="pd-action go">추세 확인되면 2차 분할 진입. 트레일링 스탑 유지.</div></div>
+          </div></div></div>
+        </div>
+      </div>
+
+      <div class="phase" data-tone="peak">
+        <div class="phase-dot"></div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <span class="phase-date">06.26</span>
+            <span class="phase-name">D+10 · 나스닥 100 <b>편입 발표</b> · 수급 클라이맥스</span>
+            <span class="badge peak">정점</span>
+          </div>
+          <div class="phase-detail"><div class="phase-detail-inner"><div class="pd-grid">
+            <div class="pd-block"><div class="pd-label">시장 상황</div><p>매수 압력 기대가 최고조. 동시에 "sell the news" 전환점. 선반영됐다면 여기가 고점.</p></div>
+            <div class="pd-block"><div class="pd-label">대응</div><div class="pd-action peak">발표 당일/직후 전량 또는 대부분 청산. 핵심 익절 타이밍.</div></div>
+          </div></div></div>
+        </div>
+      </div>
+
+      <div class="phase" data-tone="exit">
+        <div class="phase-dot"></div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <span class="phase-date">07.02~03</span>
+            <span class="phase-name">D+15 · <b>실제 인덱스 편입</b> · 의무 매수 데드라인</span>
+            <span class="badge exit">청산</span>
+          </div>
+          <div class="phase-detail"><div class="phase-detail-inner"><div class="pd-grid">
+            <div class="pd-block"><div class="pd-label">시장 상황</div><p>ETF 의무 매수 완료 = 수급 이벤트 종료. 이후 차익 매물 출회 시작.</p></div>
+            <div class="pd-block"><div class="pd-label">대응</div><div class="pd-action exit">잔여 물량 전량 청산. 이 시점 이후 신규 진입은 늦음.</div></div>
+          </div></div></div>
+        </div>
+      </div>
+
+      <div class="phase" data-tone="abort">
+        <div class="phase-dot"></div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <span class="phase-date">12.09</span>
+            <span class="phase-name"><b>락업 해제</b> (180일) · 내부자 대량 매도 가능</span>
+            <span class="badge abort">위험</span>
+          </div>
+          <div class="phase-detail"><div class="phase-detail-inner"><div class="pd-grid">
+            <div class="pd-block"><div class="pd-label">시장 상황</div><p>머스크(지분 ~42%) + 초기 투자자 + 은행 신디케이트 물량 동시 해제. "역사상 최대 내부자 매도" 우려.</p></div>
+            <div class="pd-block"><div class="pd-label">대응</div><div class="pd-action abort">레버리지 ETF 절대 보유 금지. 이미 청산 완료 상태여야 함.</div></div>
+          </div></div></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ 03 SIMULATOR ============ -->
+  <section class="reveal">
+    <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">레버리지 시뮬레이터</span></div>
+    <div class="divider"></div>
+    <p class="sec-desc">나스닥 100의 단일 일일 변동률을 조정하면 각 ETF의 수익률이 실시간 반영된다. 슬라이더를 움직여 2배(QLD)와 3배(TQQQ)의 비대칭 위험을 체감하라.</p>
+
+    <div class="sim">
+      <div class="sim-control">
+        <div class="row">
+          <label>NASDAQ-100 일일 변동률</label>
+          <span class="sim-val pos" id="ndxVal">+5.0%</span>
+        </div>
+        <input type="range" id="ndxRange" min="-15" max="15" value="5" step="0.5">
+        <div class="scale-marks"><span>-15%</span><span>0%</span><span>+15%</span></div>
+      </div>
+
+      <div class="sim-out">
+        <div class="etf-card qqq">
+          <div class="lev">1× · 기준</div>
+          <div class="ticker">QQQ</div>
+          <div class="ret pos" id="qqqRet">+5.0%</div>
+          <div class="bar-track"><div class="bar-fill" id="qqqBar"></div></div>
+          <div class="note">나스닥 100 직접 추종</div>
+        </div>
+        <div class="etf-card">
+          <div class="lev">2× · 레버리지</div>
+          <div class="ticker" style="color:var(--go)">QLD</div>
+          <div class="ret pos" id="qldRet">+10.0%</div>
+          <div class="bar-track"><div class="bar-fill" id="qldBar"></div></div>
+          <div class="note" id="qldNote">순한 맛 · 변동성 침식 중간</div>
+        </div>
+        <div class="etf-card">
+          <div class="lev">3× · 레버리지</div>
+          <div class="ticker" style="color:var(--flame-bright)">TQQQ</div>
+          <div class="ret pos" id="tqqqRet">+15.0%</div>
+          <div class="bar-track"><div class="bar-fill" id="tqqqBar"></div></div>
+          <div class="note" id="tqqqNote">매운 맛 · 변동성 침식 심함</div>
+        </div>
+      </div>
+      <div class="sim-warn" id="simWarn"></div>
+    </div>
+  </section>
+
+  <!-- ============ 04 DECAY ============ -->
+  <section class="reveal">
+    <div class="sec-head"><span class="sec-num">04</span><span class="sec-title">변동성 침식의 함정</span></div>
+    <div class="divider"></div>
+    <p class="sec-desc">레버리지 ETF는 "일일 수익률"을 배수로 추종한다. 나스닥이 +10% 후 -9.09%로 제자리에 돌아와도, 레버리지 ETF는 손실이 남는다. 횡보장에서 가만히 있어도 가치가 녹는 이유.</p>
+    <div class="decay">
+      <div class="decay-card">
+        <h4><span>QLD <span class="x2">2×</span></span><span class="lbl">나스닥 제자리</span></h4>
+        <div class="seq">
+          Day 1 &nbsp;+10% × 2 = +20% <span class="arr">→</span> 100 → 120<br>
+          Day 2 &nbsp;-9.09% × 2 = -18.2% <span class="arr">→</span> 120 → 98.2
+        </div>
+        <div class="lbl">결과</div>
+        <div class="result x2">-1.8%</div>
+      </div>
+      <div class="decay-card">
+        <h4><span>TQQQ <span class="x3">3×</span></span><span class="lbl">나스닥 제자리</span></h4>
+        <div class="seq">
+          Day 1 &nbsp;+10% × 3 = +30% <span class="arr">→</span> 100 → 130<br>
+          Day 2 &nbsp;-9.09% × 3 = -27.3% <span class="arr">→</span> 130 → 94.5
+        </div>
+        <div class="lbl">결과</div>
+        <div class="result x3">-5.5%</div>
+      </div>
+    </div>
+    <p class="hint" style="margin-top:18px">동일한 횡보장에서 침식 속도가 약 3배 차이 — TQQQ는 버티는 힘이 약하다</p>
+  </section>
+
+  <!-- ============ 05 FINANCIALS ============ -->
+  <section class="reveal">
+    <div class="sec-head"><span class="sec-num">05</span><span class="sec-title">S-1 재무 실상</span></div>
+    <div class="divider"></div>
+    <p class="sec-desc">수급 이벤트와 별개로, 펀더멘털은 적자 기업에 애플급 밸류를 매기는 구조다. Starlink가 벌고 xAI가 태운다.</p>
+    <div class="fin">
+      <div class="cell"><div class="fk">2025 매출</div><div class="fv good">$18.7B</div><div class="fsub">Starlink 61% 기여</div></div>
+      <div class="cell"><div class="fk">2025 GAAP 순손실</div><div class="fv bad">-$4.9B</div><div class="fsub">영업손실 -$2.6B</div></div>
+      <div class="cell"><div class="fk">Q1 2026 분기손실</div><div class="fv bad">-$4.3B</div><div class="fsub">xAI 통합 본격화</div></div>
+      <div class="cell"><div class="fk">누적 적자</div><div class="fv bad">-$41.3B</div><div class="fsub">자본 수요 지속</div></div>
+      <div class="cell"><div class="fk">조정 EBITDA</div><div class="fv warn">$6.6B</div><div class="fsub">"포장된" 흑자</div></div>
+      <div class="cell"><div class="fk">PSR (매출 멀티플)</div><div class="fv bad">~94×</div><div class="fsub">애플 ~8× / 엔비디아 ~25×</div></div>
+    </div>
+  </section>
+
+  <!-- ============ 06 RISKS ============ -->
+  <section class="reveal">
+    <div class="sec-head"><span class="sec-num">06</span><span class="sec-title">S-1 6대 리스크</span></div>
+    <div class="divider"></div>
+    <p class="sec-desc">공시가 직접 적시한 리스크. 이 중 하나만 터져도 레버리지 ETF는 배수로 손실을 본다.</p>
+    <div class="risks">
+      <div class="risk"><div class="rh"><span class="rn">01</span><span class="rt">밸류에이션 과부하</span></div><p>목표 <span class="metric">$1.75~2T</span>, 매출 대비 <span class="metric">94배</span> 멀티플. 적자 기업에 메가캡 가치 부여.</p></div>
+      <div class="risk"><div class="rh"><span class="rn">02</span><span class="rt">Starship 로드쇼 충돌</span></div><p>6월 Flight 12 예정. 로드쇼 기간 중 <span class="metric">실패 시 IPO 심리 붕괴</span> 가능. 타이밍 최악 중첩.</p></div>
+      <div class="risk"><div class="rh"><span class="rn">03</span><span class="rt">xAI 현금 소각</span></div><p>AI 부문 연간 손실 <span class="metric">~$10B</span> 예상. Starlink 수익으로 메우는 구조.</p></div>
+      <div class="risk"><div class="rh"><span class="rn">04</span><span class="rt">머스크 1인 지배</span></div><p>의결권 <span class="metric">~85%</span>. 독립이사·보상위 요건 면제. 공개주주 영향력 전무.</p></div>
+      <div class="risk"><div class="rh"><span class="rn">05</span><span class="rt">락업 해제 폭탄</span></div><p>180일 후 <span class="metric">내부자 동시 매도</span> 가능. 12월 대형 매도 압력.</p></div>
+      <div class="risk"><div class="rh"><span class="rn">06</span><span class="rt">Anthropic 계약 불안정</span></div><p>월 <span class="metric">$1.25B</span> 매출이 <span class="metric">90일 통보 해지</span> 가능. 반복 매출 아님.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ 07 VERDICT ============ -->
+  <section class="reveal">
+    <div class="sec-head"><span class="sec-num">07</span><span class="sec-title">최종 판단</span></div>
+    <div class="divider"></div>
+    <div class="verdict">
+      <div class="vlabel">Mission Briefing · 종합 결론</div>
+      <div class="vmain">수급 이벤트(편입)와 펀더멘털(적자 94배)이 <span class="hl">완전히 분리</span>된 구조. <span class="go">7월 편입까지는 수급이 지배</span>, 그 이후는 <span class="ab">펀더멘털이 돌아오며 조정 압력</span>.</div>
+      <ul>
+        <li><b>상품 선택:</b> 변수(Starship·머스크·거시)가 많은 이번 이벤트는 출렁임을 견뎌야 하므로 <b>QLD(2×)가 TQQQ(3×)보다 리스크 대비 합리적</b>. TQQQ는 확신 100%일 때만.</li>
+        <li><b>진입:</b> 6월 중순 상장 변동성 진정 후, 추세 확인하며 <b>분할 진입</b>.</li>
+        <li><b>청산:</b> 편입 발표(6/26)~실제 편입(7/3) 사이 <b>전량 청산</b>. "빨리 타고 빨리 내려라."</li>
+        <li><b>철칙:</b> 손절선 선설정 · 오버나이트 최소화 · 물타기 금지 · <b>12월 락업 전 반드시 정리</b>.</li>
+        <li><b>본질:</b> 이건 펀더멘털 투자가 아니라 <b>수급 베팅</b>. 시나리오가 틀어지면 회복 불가 손실.</li>
+      </ul>
+    </div>
+
+    <div class="disclaimer">
+      <div class="dt">⚠ Disclaimer · 투자 책임 고지</div>
+      <p>본 자료는 공개된 S-1 공시·언론 보도를 바탕으로 한 <b>분석 및 시나리오 정리</b>이며, 투자 권유나 자문이 아닙니다. 레버리지 ETF(QLD·TQQQ)는 변동성 침식과 복리 효과로 장기 보유 시 원금 손실 위험이 크며, 모든 일정·밸류에이션·편입 가정은 변동될 수 있습니다(IPO 일정 미확정 가능성 포함). 모든 매매 결정과 손익은 전적으로 투자자 본인의 판단과 책임입니다.</p>
+    </div>
+  </section>
+
+  <footer>
+    OPERATION SPCX WAVE · 분석 기준일 2026.05.29 · 생성: Mission Control Console
+    <div class="sources">
+      <a href="https://www.sec.gov/Archives/edgar/data/0001181412/000162828026036936/spaceexplorationtechnologi.htm" target="_blank" rel="noopener">SEC S-1 (EDGAR)</a>
+      <a href="https://www.abianalytics.com/SpaceX_IPO_Summary.html" target="_blank" rel="noopener">ABI Analytics</a>
+      <a href="https://www.bitmex.com/blog/spacex-ipo-guide" target="_blank" rel="noopener">BitMEX Guide</a>
+      <a href="https://www.cnbc.com/2026/05/20/spacex-ipo-live-updates.html" target="_blank" rel="noopener">CNBC</a>
+      <a href="https://cryptobriefing.com/spacex-ipo-targets-17t-valuation-prediction-markets-show-high-confidence/" target="_blank" rel="noopener">Crypto Briefing</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  /* ===== Countdown to 2026-06-12 ===== */
+  (function(){
+    const target = new Date('2026-06-12T00:00:00');
+    const today = new Date('2026-05-29T00:00:00');
+    const diff = Math.round((target - today)/(1000*60*60*24));
+    document.getElementById('dday').textContent = diff > 0 ? 'D-'+diff : (diff===0?'D-DAY':'D+'+Math.abs(diff));
+  })();
+
+  /* ===== Timeline accordion ===== */
+  document.querySelectorAll('.phase').forEach(p=>{
+    p.addEventListener('click',()=>{
+      const wasOpen = p.classList.contains('open');
+      document.querySelectorAll('.phase').forEach(x=>x.classList.remove('open'));
+      if(!wasOpen) p.classList.add('open');
+    });
+  });
+
+  /* ===== Leverage simulator ===== */
+  (function(){
+    const range = document.getElementById('ndxRange');
+    const ndxVal = document.getElementById('ndxVal');
+    const els = {
+      qqq:{ret:document.getElementById('qqqRet'),bar:document.getElementById('qqqBar')},
+      qld:{ret:document.getElementById('qldRet'),bar:document.getElementById('qldBar')},
+      tqqq:{ret:document.getElementById('tqqqRet'),bar:document.getElementById('tqqqBar')}
+    };
+    const warn = document.getElementById('simWarn');
+    const fmt = v => (v>=0?'+':'')+v.toFixed(1)+'%';
+    const MAX = 45; // bar scale (3x of 15)
+
+    function setCard(c, val){
+      c.ret.textContent = fmt(val);
+      c.ret.className = 'ret ' + (val>=0?'pos':'neg');
+      const pct = Math.min(Math.abs(val)/MAX,1)*50;
+      c.bar.style.width = pct+'%';
+      if(val>=0){ c.bar.style.left='50%'; c.bar.style.background='var(--go)'; }
+      else { c.bar.style.left=(50-pct)+'%'; c.bar.style.background='var(--abort)'; }
+    }
+
+    function update(){
+      const n = parseFloat(range.value);
+      ndxVal.textContent = fmt(n);
+      ndxVal.className = 'sim-val ' + (n>=0?'pos':'neg');
+      setCard(els.qqq, n);
+      setCard(els.qld, n*2);
+      setCard(els.tqqq, n*3);
+
+      // contextual warning
+      if(n*3 <= -33){
+        warn.className='sim-warn show';
+        warn.innerHTML='☠ 나스닥 '+fmt(n)+' → TQQQ '+fmt(n*3)+' · 사실상 원금 전손 수준. 3배 레버리지의 비대칭 위험이 현실화되는 구간.';
+      } else if(n*2 <= -20){
+        warn.className='sim-warn show';
+        warn.innerHTML='⚠ TQQQ '+fmt(n*3)+' vs QLD '+fmt(n*2)+' · 악재 발생 시 회복 가능성은 QLD가 훨씬 높다.';
+      } else if(n >= 8){
+        warn.className='sim-warn show';
+        warn.innerHTML='▲ 강한 단방향 상승은 레버리지가 빛나는 유일한 구간. 단, 편입 발표 후엔 동력 소멸.';
+      } else {
+        warn.className='sim-warn';
+      }
+    }
+    range.addEventListener('input',update);
+    update();
+  })();
+
+  /* ===== Scroll reveal ===== */
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
